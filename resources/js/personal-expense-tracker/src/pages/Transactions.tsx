@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import { Plus, Search, Filter, ArrowDownRight, DollarSign, X } from 'lucide-react';
 import { MOCK_TRANSACTIONS, MOCK_CATEGORIES, MOCK_WALLETS } from '../store/MockData';
+import { useExpenseCategories } from '../store/useExpenseCategories';
 import { format, parseISO } from 'date-fns';
 
 export const Transactions = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all'); // all, income, expense
+  const categories = useExpenseCategories();
+  const categoryOptions = categories.length ? categories : MOCK_CATEGORIES;
 
   const filteredTransactions = MOCK_TRANSACTIONS.filter((tx) => {
     const matchesSearch = tx.note?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -77,7 +80,7 @@ export const Transactions = () => {
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">
               {filteredTransactions.map((tx) => {
-                const category = MOCK_CATEGORIES.find(c => c.id === tx.categoryId);
+                const category = categoryOptions.find(c => c.id === tx.categoryId) || MOCK_CATEGORIES.find(c => c.id === tx.categoryId);
                 const wallet = MOCK_WALLETS.find(w => w.id === tx.walletId);
                 const isIncome = tx.type === 'income';
                 return (
@@ -159,7 +162,7 @@ export const Transactions = () => {
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
                 <select className="block w-full bg-white border border-slate-200 text-slate-900 rounded-xl focus:ring-primary-500 focus:border-primary-500 sm:text-sm py-2.5 shadow-sm">
-                  {MOCK_CATEGORIES.map(c => (
+                  {categoryOptions.map(c => (
                     <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
                 </select>

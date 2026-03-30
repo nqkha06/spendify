@@ -45,6 +45,67 @@ import {
 import { router } from '@inertiajs/react';
 import { useState, useEffect, useRef, type ReactNode } from 'react';
 
+const dateOnlyFormatter = new Intl.DateTimeFormat('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+});
+
+const dateTimeFormatter = new Intl.DateTimeFormat('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+});
+
+const isDateLikeColumn = (columnId: string): boolean => {
+    return /(date|time|_at|created|updated|expired|ngay)/i.test(columnId);
+};
+
+const isDateLikeValue = (value: string): boolean => {
+    return /^\d{4}-\d{2}-\d{2}(?:[T\s]\d{2}:\d{2}(?::\d{2})?)?/.test(value);
+};
+
+const hasTimePart = (value: string): boolean => {
+    return /[T\s]\d{2}:\d{2}/i.test(value);
+};
+
+const formatTableValue = (value: unknown, columnId: string): ReactNode => {
+    if (value === null || value === undefined) {
+        return '';
+    }
+
+    if (value instanceof Date) {
+        return dateTimeFormatter.format(value);
+    }
+
+    if (typeof value === 'string') {
+        const raw = value.trim();
+
+        if (raw === '') {
+            return '';
+        }
+
+        const shouldTryDateFormat = isDateLikeColumn(columnId) || isDateLikeValue(raw);
+
+        if (shouldTryDateFormat) {
+            const timestamp = Date.parse(raw);
+
+            if (!Number.isNaN(timestamp)) {
+                const date = new Date(timestamp);
+                return hasTimePart(raw)
+                    ? dateTimeFormatter.format(date)
+                    : dateOnlyFormatter.format(date);
+            }
+        }
+
+        return raw;
+    }
+
+    return value as ReactNode;
+};
+
 interface Column<T = any> {
     id: string;
     label: string;
@@ -387,7 +448,12 @@ export function DataTable<T>({
                                             .filter((c) => visibleColumns.includes(c.id))
                                             .map((col) => (
                                                 <TableCell key={`${col.id}-${idx}`} className={col.id === 'name' ? 'font-medium' : undefined}>
-                                                    {col.render ? col.render(item) : (item as any)[col.id]}
+                                                    {col.render
+                                                        ? col.render(item)
+                                                        : formatTableValue(
+                                                              (item as any)[col.id],
+                                                              col.id
+                                                          )}
                                                 </TableCell>
                                             ))}
 

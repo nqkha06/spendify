@@ -169,6 +169,28 @@
     --shadow-card: 0 20px 40px -15px rgba(0,0,0,0.08);
 }
 
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+@layer utilities {
+    .animate-marquee {
+        animation: marquee 35s linear infinite;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-marquee {
+        animation: none;
+        transform: translateX(0);
+    }
+}
+
 @utility no-scrollbar {
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */

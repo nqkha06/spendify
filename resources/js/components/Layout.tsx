@@ -54,8 +54,8 @@ export default function Layout({
 
                     <div className="hidden md:flex items-center gap-8 font-medium text-slate-600">
                         <a href="/#features" className="hover:text-brand-600 transition-colors">Features</a>
-                        <a href="/#dashboard" className="hover:text-brand-600 transition-colors">Dashboard</a>
-                        <a href="/#pricing" className="hover:text-brand-600 transition-colors">Pricing</a>
+                        <a href="/#how-it-works" className="hover:text-brand-600 transition-colors">Workflow</a>
+                        <a href="/#templates" className="hover:text-brand-600 transition-colors">Templates</a>
                         <a href="/#contact" className="hover:text-brand-600 transition-colors">Contact</a>
                     </div>
 

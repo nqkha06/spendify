@@ -27,10 +27,12 @@ class UserController extends Controller
         $sortBy = $request->get('sort_by', 'created_at');
         $sortDirection = $request->get('sort_direction', 'desc');
 
-        // Paginate
         $perPage = $request->get('per_page', 10);
         $users = $this->service->paginate([
-            'keyword' => $request->get('search', null),
+            'search' => $request->get('search'),
+            'sort_by' => $sortBy,
+            'sort_direction' => $sortDirection,
+            'per_page' => $perPage,
         ]);
 
         return Inertia::render('Admin/users/list', [
@@ -47,6 +49,7 @@ class UserController extends Controller
                 'search' => $request->search,
                 'sort_by' => $sortBy,
                 'sort_direction' => $sortDirection,
+                'per_page' => (int) $perPage,
             ],
         ]);
     }

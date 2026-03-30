@@ -1,5 +1,4 @@
 import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
 import {
     Sidebar,
     SidebarContent,
@@ -16,10 +15,12 @@ import adminPermissions from '@/routes/admin/permissions';
 import adminLanguages from '@/routes/admin/settings/languages';
 import adminAppearance from '@/routes/admin/settings/appearance/options';
 import adminMerchants from '@/routes/admin/merchants';
+import adminCategories from '@/routes/admin/categories';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Folder, Users, Settings, AlertTriangle, Languages, Shield, Key } from 'lucide-react';
+import { Folder, Users, Settings, AlertTriangle, Languages, Shield, Key, Tags } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
+import { Button } from "@/components/ui/button"
 
 const adminNavItems: NavItem[] = [
     {
@@ -47,6 +48,11 @@ const adminNavItems: NavItem[] = [
         title: 'Merchants',
         href: adminMerchants.index().url,
         icon: Folder,
+    },
+    {
+        title: 'Categories',
+        href: adminCategories.index().url,
+        icon: Tags,
     },
     {
         title: 'Appearance',
@@ -103,7 +109,12 @@ export function AdminSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavUser />
+                <Button variant="outline" size="sm" className="w-full">
+                    <a href="/user" target="_blank" className="flex items-center">
+                        <AlertTriangle className="size-4 mr-2" />
+                        Go to User
+                    </a>
+                </Button>
             </SidebarFooter>
         </Sidebar>
     );

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Repositories\Contracts\UserRepositoryInterface as UserRepository;
 use App\Services\BaseService;
+
 /**
  * Class UserService
  * @package App\Services
