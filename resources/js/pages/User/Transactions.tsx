@@ -1,10 +1,17 @@
 import { useState } from 'react';
 import { Plus, Search, Filter, ArrowDownRight, DollarSign, X } from 'lucide-react';
-import { MOCK_TRANSACTIONS, MOCK_CATEGORIES, MOCK_WALLETS } from '../store/MockData';
-import { useExpenseCategories } from '../store/useExpenseCategories';
+import ExpenseLayout from '@/components/expense-tracker/layout';
+import { MOCK_TRANSACTIONS, MOCK_CATEGORIES, MOCK_WALLETS } from '@/lib/mock-data';
+import { useExpenseCategories } from '@/hooks/use-expense-categories';
+import type { ExpenseNavigationItem, ExpenseProfile } from '@/types/expense-tracker';
 import { format, parseISO } from 'date-fns';
 
-export const Transactions = () => {
+interface TransactionsProps {
+  navigation: ExpenseNavigationItem[];
+  profile?: ExpenseProfile;
+}
+
+export default function Transactions({ navigation, profile }: TransactionsProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all'); // all, income, expense
@@ -18,12 +25,17 @@ export const Transactions = () => {
   }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return (
+    <ExpenseLayout
+      title="Transactions"
+      heading="Transactions"
+      description="Record every income and expense in one place."
+      activePath="/user/transactions"
+      navigation={navigation}
+      profile={profile}
+    >
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Transactions</h1>
-          <p className="text-slate-500 text-sm">Manage your incoming and outgoing expenses.</p>
-        </div>
+
         <button
           onClick={() => setIsModalOpen(true)}
           className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-xl font-medium flex items-center gap-2 transition-colors shadow-sm shadow-primary-500/30"
@@ -136,7 +148,7 @@ export const Transactions = () => {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
             <div className="flex justify-between items-center p-5 border-b border-slate-100">
               <h2 className="text-xl font-bold text-slate-900">Add Transaction</h2>
-              <button 
+              <button
                 onClick={() => setIsModalOpen(false)}
                 className="text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-1.5 rounded-lg transition-colors"
               >
@@ -180,7 +192,7 @@ export const Transactions = () => {
 
             </div>
             <div className="p-5 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
-              <button 
+              <button
                 onClick={() => setIsModalOpen(false)}
                 className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 transition-colors"
               >
@@ -194,5 +206,6 @@ export const Transactions = () => {
         </div>
       )}
     </div>
+    </ExpenseLayout>
   );
-};
+}

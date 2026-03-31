@@ -1,13 +1,23 @@
 import { User, Bell, Shield, Palette, Globe, ChevronRight } from 'lucide-react';
+import ExpenseLayout from '@/components/expense-tracker/layout';
+import type { ExpenseNavigationItem, ExpenseProfile } from '@/types/expense-tracker';
 
-export const Settings = () => {
+interface SettingProps {
+  navigation: ExpenseNavigationItem[];
+  profile?: ExpenseProfile;
+}
+
+export default function Setting({ navigation, profile }: SettingProps) {
   return (
+    <ExpenseLayout
+      title="Settings"
+      heading="Settings"
+      description="Manage your profile and application preferences."
+      activePath="/user/settings"
+      navigation={navigation}
+      profile={profile}
+    >
     <div className="space-y-6 max-w-4xl mx-auto w-full">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Settings</h1>
-        <p className="text-slate-500 text-sm">Manage your profile and application preferences.</p>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {/* Navigation Sidebar */}
         <div className="md:col-span-1 space-y-1">
@@ -48,7 +58,7 @@ export const Settings = () => {
         <div className="md:col-span-3 space-y-6">
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
             <h2 className="text-lg font-bold text-slate-900 mb-6">Profile Information</h2>
-            
+
             <div className="flex items-center gap-6 mb-8">
               <div className="h-20 w-20 bg-linear-to-tr from-primary-500 to-indigo-500 rounded-full border-4 border-white shadow-md flex items-center justify-center text-white overflow-hidden text-2xl font-bold">
                 JD
@@ -97,5 +107,6 @@ export const Settings = () => {
         </div>
       </div>
     </div>
+    </ExpenseLayout>
   );
-};
+}

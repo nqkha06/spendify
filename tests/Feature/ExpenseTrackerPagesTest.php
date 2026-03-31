@@ -1,32 +1,37 @@
 <?php
 
+use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
-// it('renders all expense tracker pages with mock data', function (): void {
-//     $this->withoutVite();
+it('renders expense tracker pages for guests', function (): void {
+    $this->withoutVite();
 
-//     $pages = [
-//         '/user' => 'ExpenseTracker/App',
-//         '/user/dashboard' => 'ExpenseTracker/App',
-//         '/user/transactions' => 'ExpenseTracker/App',
-//         '/user/budgets' => 'ExpenseTracker/App',
-//         '/user/wallets' => 'ExpenseTracker/App',
-//         '/user/settings' => 'ExpenseTracker/App',
-//     ];
+    $pages = [
+        '/user' => 'User/Dashboard',
+        '/user/dashboard' => 'User/Dashboard',
+        '/user/transactions' => 'User/Transactions',
+        '/user/budgets' => 'User/Budgets',
+        '/user/settings' => 'User/Setting',
+    ];
 
-//     foreach ($pages as $uri => $component) {
-//         $this->get($uri)
-//             ->assertOk()
-//             ->assertInertia(fn (Assert $page) => $page
-//                 ->component($component)
-//             );
-//     }
-// });
+    foreach ($pages as $uri => $component) {
+        $this->get($uri)
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component($component)
+            );
+    }
+});
 
-// it('returns 404 for routes not present in personal expense tracker UI', function (): void {
-//     $this->withoutVite();
+it('renders wallets page for authenticated users', function (): void {
+    $this->withoutVite();
 
-//     $this->get('/user/about')->assertNotFound();
-//     $this->get('/user/contact')->assertNotFound();
-//     $this->get('/user/login')->assertNotFound();
-// });
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->get('/user/wallets')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('User/Wallets')
+        );
+});

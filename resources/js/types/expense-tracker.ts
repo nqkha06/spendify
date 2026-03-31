@@ -20,6 +20,8 @@ export interface ExpenseWallet {
     name: string;
     balance: number;
     type: 'cash' | 'bank' | 'credit';
+    currency?: string;
+    isDefault?: boolean;
 }
 
 export interface ExpenseTransaction {
@@ -30,6 +32,7 @@ export interface ExpenseTransaction {
     walletId: string;
     date: string;
     note?: string;
+    labels?: string[];
 }
 
 export interface ExpenseBudget {

@@ -10,6 +10,25 @@ class ExpenseDashboardController extends Controller
 {
     public function __invoke(): Response
     {
-        return Inertia::render('ExpenseTracker/App');
+        $user = request()->user();
+
+        return Inertia::render('User/Dashboard', [
+            'navigation' => [
+                ['label' => 'Dashboard', 'href' => route('expense.dashboard')],
+                ['label' => 'Transactions', 'href' => route('expense.transactions')],
+                ['label' => 'Budgets', 'href' => route('expense.budgets')],
+                ['label' => 'Wallets', 'href' => route('expense.wallets')],
+                ['label' => 'Settings', 'href' => route('expense.settings')],
+            ],
+            'profile' => [
+                'name' => $user?->name ?? 'Guest',
+                'email' => $user?->email ?? 'guest@example.com',
+                'initials' => collect(explode(' ', (string) ($user?->name ?? 'Guest')))
+                    ->filter()
+                    ->take(2)
+                    ->map(fn (string $part): string => strtoupper(substr($part, 0, 1)))
+                    ->implode(''),
+            ],
+        ]);
     }
 }

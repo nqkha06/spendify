@@ -1,6 +1,8 @@
 import { ArrowDownRight, ArrowUpRight, TrendingUp, Wallet, DollarSign } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { MOCK_TRANSACTIONS, MOCK_WALLETS, MOCK_CATEGORIES } from '../store/MockData';
+import ExpenseLayout from '@/components/expense-tracker/layout';
+import { MOCK_TRANSACTIONS, MOCK_WALLETS, MOCK_CATEGORIES } from '@/lib/mock-data';
+import type { ExpenseNavigationItem, ExpenseProfile } from '@/types/expense-tracker';
 import { format, parseISO } from 'date-fns';
 
 const data = [
@@ -13,24 +15,34 @@ const data = [
   { name: 'Jul', value: 3490 },
 ];
 
-const categoryData = MOCK_CATEGORIES.map(cat => ({
+const categoryData = MOCK_CATEGORIES.map((cat) => ({
   name: cat.name,
   value: Math.floor(Math.random() * 500) + 50,
-  color: cat.color
+  color: cat.color,
 }));
 
-export const Dashboard = () => {
+interface DashboardProps {
+  navigation: ExpenseNavigationItem[];
+  profile?: ExpenseProfile;
+}
+
+export default function Dashboard({ navigation, profile }: DashboardProps) {
   const totalBalance = MOCK_WALLETS.reduce((acc, wallet) => acc + wallet.balance, 0);
   const totalIncome = 3000;
   const totalExpense = 425.50;
 
   return (
+    <ExpenseLayout
+      title="Dashboard"
+      heading="Financial Overview"
+      description="Track balances, cash flow, and spending snapshots."
+      activePath="/user/dashboard"
+      navigation={navigation}
+      profile={profile}
+    >
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Financial Overview</h1>
-          <p className="text-slate-500 text-sm">Welcome back! Here's your financial summary.</p>
-        </div>
+
         <div className="flex space-x-2">
           <select className="bg-white border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block p-2 shadow-sm font-medium">
             <option>This Month</option>
@@ -110,7 +122,7 @@ export const Dashboard = () => {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} tickFormatter={(value) => `$${value}`} />
-                <Tooltip 
+                <Tooltip
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                   itemStyle={{ color: '#0f172a', fontWeight: 600 }}
                 />
@@ -140,7 +152,7 @@ export const Dashboard = () => {
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip 
+                <Tooltip
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                   itemStyle={{ fontWeight: 500 }}
                   formatter={(value: any) => [`$${value}`, 'Amount']}
@@ -219,5 +231,6 @@ export const Dashboard = () => {
         </div>
       </div>
     </div>
+    </ExpenseLayout>
   );
-};
+}

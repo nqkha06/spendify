@@ -17,6 +17,7 @@ use App\Http\Controllers\User\ExpenseHomeController;
 use App\Http\Controllers\User\ExpenseSettingsController;
 use App\Http\Controllers\User\ExpenseTransactionsController;
 use App\Http\Controllers\User\ExpenseWalletsController;
+use App\Http\Controllers\User\WalletStoreController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -29,7 +30,8 @@ Route::prefix('user')->name('expense.')->group(function () {
     Route::get('/dashboard', ExpenseDashboardController::class)->name('dashboard');
     Route::get('/transactions', ExpenseTransactionsController::class)->name('transactions');
     Route::get('/budgets', ExpenseBudgetsController::class)->name('budgets');
-    Route::get('/wallets', ExpenseWalletsController::class)->name('wallets');
+    Route::get('/wallets', ExpenseWalletsController::class)->middleware('auth')->name('wallets');
+    Route::post('/wallets', WalletStoreController::class)->middleware('auth')->name('wallets.store');
     Route::get('/settings', ExpenseSettingsController::class)->name('settings');
     Route::get('/categories', CategoryListController::class)->name('categories.index');
 });
