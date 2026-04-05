@@ -1,12 +1,12 @@
-import AdminLayout from '@/layouts/admin';
-import adminCategories from '@/routes/admin/categories';
-import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { DataTable } from '@/components/data-table';
-import { CategoriesPrimaryButtons } from './components/categories-primary-buttons';
-import { DeleteCategoryDialog } from './components/categories-dialogs';
 import { Badge } from '@/components/ui/badge';
+import AdminLayout from '@/layouts/admin';
+import adminCategories from '@/routes/admin/categories';
+import type {BreadcrumbItem} from '@/types';
+import { DeleteCategoryDialog } from './components/categories-dialogs';
+import { CategoriesPrimaryButtons } from './components/categories-primary-buttons';
 
 interface Category {
     id: number;

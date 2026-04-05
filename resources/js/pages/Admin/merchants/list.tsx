@@ -1,12 +1,12 @@
-import AdminLayout from '@/layouts/admin';
-import adminMerchants from '@/routes/admin/merchants';
-import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { DataTable } from '@/components/data-table';
-import { MerchantsPrimaryButtons } from './components/merchants-primary-buttons';
-import { DeleteMerchantDialog } from './components/merchants-dialogs';
 import { Badge } from '@/components/ui/badge';
+import AdminLayout from '@/layouts/admin';
+import adminMerchants from '@/routes/admin/merchants';
+import type {BreadcrumbItem} from '@/types';
+import { DeleteMerchantDialog } from './components/merchants-dialogs';
+import { MerchantsPrimaryButtons } from './components/merchants-primary-buttons';
 
 interface Merchant {
     id: number;

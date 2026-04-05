@@ -91,3 +91,42 @@ test('transactions page renders user transaction data', function () {
             ->where('data.transactions.0.type', 'income')
         );
 });
+
+test('dashboard page renders real financial data for authenticated user', function () {
+    $user = User::factory()->create();
+
+    $wallet = UserWallet::factory()->for($user)->create([
+        'name' => 'Ví chính',
+        'opening_balance' => 500,
+        'currency' => 'USD',
+        'is_default' => true,
+    ]);
+
+    $category = Category::factory()->create([
+        'name' => 'Lương',
+        'status' => 'active',
+    ]);
+
+    ExpenseTransaction::factory()->create([
+        'user_id' => $user->id,
+        'wallet_id' => $wallet->id,
+        'category_id' => $category->id,
+        'type' => 'income',
+        'amount' => 1500,
+        'transacted_at' => now()->format('Y-m-d'),
+        'note' => 'Thu nhập tháng',
+        'status' => 'posted',
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('expense.dashboard'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('User/Dashboard')
+            ->has('data.wallets', 1)
+            ->has('data.categories', 1)
+            ->has('data.transactions', 1)
+            ->where('data.transactions.0.note', 'Thu nhập tháng')
+            ->where('data.transactions.0.type', 'income')
+        );
+});

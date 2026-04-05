@@ -1,18 +1,20 @@
-import { Breadcrumbs } from '@/components/breadcrumbs';
-import { SidebarTrigger } from '@/components/ui/sidebar';
-import { Button } from '@/components/ui/button';
-import { type BreadcrumbItem as BreadcrumbItemType, type SharedData } from '@/types';
-import { Sun, Moon, LucideIcon } from 'lucide-react';
 import { usePage } from '@inertiajs/react';
-import { Appearance, useAppearance } from '@/hooks/use-appearance';
+import type { LucideIcon } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
+import { Breadcrumbs } from '@/components/breadcrumbs';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import type { Appearance} from '@/hooks/use-appearance';
+import { useAppearance } from '@/hooks/use-appearance';
 import { useInitials } from '@/hooks/use-initials';
+import type {BreadcrumbItem as BreadcrumbItemType, SharedData} from '@/types';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { UserMenuContent } from './user-menu-content';
 
 interface AdminHeaderProps {

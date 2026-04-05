@@ -1,3 +1,4 @@
+import { useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -7,7 +8,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { useForm } from '@inertiajs/react';
 import adminMerchants from '@/routes/admin/merchants';
 
 interface Merchant {

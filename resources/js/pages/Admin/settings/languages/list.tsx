@@ -1,11 +1,11 @@
-import AdminLayout from '@/layouts/admin'
-import adminLanguages from '@/routes/admin/settings/languages'
-import { type BreadcrumbItem } from '@/types'
 import { Head, router } from '@inertiajs/react'
 import { useState } from 'react'
 import { DataTable } from '@/components/data-table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import AdminLayout from '@/layouts/admin'
+import adminLanguages from '@/routes/admin/settings/languages'
+import type {BreadcrumbItem} from '@/types';
 
 interface Language {
     id: number

@@ -1,11 +1,11 @@
-import AdminLayout from '@/layouts/admin';
-import adminPermissions from '@/routes/admin/permissions';
-import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { DataTable } from '@/components/data-table';
-import { PermissionsPrimaryButtons } from './components/permissions-primary-buttons';
+import AdminLayout from '@/layouts/admin';
+import adminPermissions from '@/routes/admin/permissions';
+import type {BreadcrumbItem} from '@/types';
 import { DeletePermissionDialog } from './components/permissions-dialogs';
+import { PermissionsPrimaryButtons } from './components/permissions-primary-buttons';
 
 interface Permission {
     id: number;

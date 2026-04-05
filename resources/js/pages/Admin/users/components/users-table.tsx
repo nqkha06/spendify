@@ -1,3 +1,4 @@
+import { Pencil, Trash2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     Table,
@@ -7,8 +8,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Pencil, Trash2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
-import { type User } from '@/types';
+import type {User} from '@/types';
 
 interface UsersTableProps {
     users: User[];

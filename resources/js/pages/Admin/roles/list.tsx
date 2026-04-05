@@ -1,12 +1,12 @@
-import AdminLayout from '@/layouts/admin';
-import adminRoles from '@/routes/admin/roles';
-import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { DataTable } from '@/components/data-table';
-import { RolesPrimaryButtons } from './components/roles-primary-buttons';
-import { DeleteRoleDialog } from './components/roles-dialogs';
 import { Badge } from '@/components/ui/badge';
+import AdminLayout from '@/layouts/admin';
+import adminRoles from '@/routes/admin/roles';
+import type {BreadcrumbItem} from '@/types';
+import { DeleteRoleDialog } from './components/roles-dialogs';
+import { RolesPrimaryButtons } from './components/roles-primary-buttons';
 
 interface Permission {
     id: number;

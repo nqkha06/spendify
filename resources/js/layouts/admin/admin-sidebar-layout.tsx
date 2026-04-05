@@ -1,10 +1,10 @@
+import type {PropsWithChildren} from 'react';
+import { AdminHeader } from '@/components/admin-header';
+import { AdminSidebar } from '@/components/admin-sidebar';
 import { AppContent } from '@/components/app-content';
 import { AppShell } from '@/components/app-shell';
-import { AdminSidebar } from '@/components/admin-sidebar';
-import { AdminHeader } from '@/components/admin-header';
 import { Toaster } from '@/components/ui/sonner';
-import { type BreadcrumbItem } from '@/types';
-import { type PropsWithChildren } from 'react';
+import type {BreadcrumbItem} from '@/types';
 
 interface AdminSidebarLayoutProps {
     breadcrumbs?: BreadcrumbItem[];

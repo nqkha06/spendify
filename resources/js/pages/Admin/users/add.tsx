@@ -1,13 +1,13 @@
-import AdminLayout from '@/layouts/admin';
-import adminUsers from '@/routes/admin/users';
-import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import type { FormEventHandler } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { FormEventHandler } from 'react';
+import AdminLayout from '@/layouts/admin';
+import adminUsers from '@/routes/admin/users';
+import type {BreadcrumbItem} from '@/types';
 
 interface Role {
     id: number;

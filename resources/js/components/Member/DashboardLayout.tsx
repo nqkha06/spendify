@@ -1,22 +1,23 @@
-import React, { ReactNode, useMemo } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import {
     Wallet, LayoutDashboard, Search, ArrowDownToLine, Receipt,
     Sparkles, Trophy, Users, User, CreditCard, Info,
     Settings, LifeBuoy, Coins, Bell, ChevronDown, LogOut
 } from 'lucide-react';
+import type { ReactNode} from 'react';
+import React, { useMemo } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
     DropdownMenu, DropdownMenuContent, DropdownMenuItem,
     DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Toaster } from '@/components/ui/sonner';
 import { useInitials } from '@/hooks/use-initials';
-import { logout } from '@/routes';
-import { edit } from '@/routes/profile';
 import { cn } from '@/lib/utils'; // Giả sử bạn có hàm cn từ shadcn/ui
-import { index as memberCashbackIndex } from '@/actions/App/Http/Controllers/Member/CashbackController';
+import { logout } from '@/routes';
 import users from "@/routes/admin/users";
+import { edit } from '@/routes/profile';
+import { index as memberCashbackIndex } from '@/actions/App/Http/Controllers/Member/CashbackController';
 
 // --- Interfaces ---
 interface NavItem {

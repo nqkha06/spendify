@@ -1,6 +1,6 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import expense from '@/routes/expense';
 import { login, register } from '@/routes';
+import expense from '@/routes/expense';
 
 export default function Welcome({
     canRegister = true,

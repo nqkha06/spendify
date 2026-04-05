@@ -1,3 +1,4 @@
+import { useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -7,9 +8,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { useForm } from '@inertiajs/react';
-import { type User } from '@/types';
 import adminUsers from '@/routes/admin/users';
+import type {User} from '@/types';
 
 interface DeleteUserDialogProps {
     open: boolean;

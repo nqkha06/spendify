@@ -1,8 +1,9 @@
-import AdminLayoutTemplate from '@/layouts/admin/admin-sidebar-layout';
-import { type BreadcrumbItem } from '@/types';
-import { type ReactNode, useEffect, useRef } from 'react';
 import { usePage } from '@inertiajs/react';
+import {  useEffect, useRef } from 'react';
+import type {ReactNode} from 'react';
 import { toast } from 'sonner';
+import AdminLayoutTemplate from '@/layouts/admin/admin-sidebar-layout';
+import type {BreadcrumbItem} from '@/types';
 
 interface AdminLayoutProps {
     children: ReactNode;

@@ -1,12 +1,12 @@
+import { Head, router } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
+import { DataTable } from '@/components/data-table';
+import { Badge } from '@/components/ui/badge';
 import AdminLayout from '@/layouts/admin';
 import adminPages from '@/routes/admin/pages';
-import { type BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/react';
-import { Badge } from '@/components/ui/badge';
-import { DataTable } from '@/components/data-table';
-import { PagesPrimaryButtons } from './components/users-primary-buttons';
+import type {BreadcrumbItem} from '@/types';
 import { DeletePageDialog } from './components/users-dialogs';
+import { PagesPrimaryButtons } from './components/users-primary-buttons';
 
 interface PageItem {
     id: number;

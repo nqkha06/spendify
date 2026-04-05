@@ -5,10 +5,8 @@ import {
     Check,
     CircleDollarSign,
     CreditCard,
-    Github,
     Landmark,
     LineChart,
-    Linkedin,
     PieChart,
     PlayCircle,
     Quote,
@@ -16,7 +14,6 @@ import {
     Sparkles,
     Target,
     TrendingUp,
-    Twitter,
     Wallet,
 } from 'lucide-react';
 import Layout from '@/components/Layout';
@@ -150,11 +147,38 @@ const testimonials = [
 
 const testimonialSlides = [...testimonials, ...testimonials];
 
+const faqs = [
+    {
+        question: 'Spendify có tự kết nối ngân hàng không?',
+        answer: 'Không. Spendify tập trung vào quản lý thủ công để bạn chủ động hoàn toàn dữ liệu và thói quen chi tiêu.',
+    },
+    {
+        question: 'Mình mất bao lâu để bắt đầu sử dụng?',
+        answer: 'Thường chỉ khoảng 2-3 phút để tạo ví đầu tiên, nhập vài giao dịch mẫu và đặt ngân sách theo tháng.',
+    },
+    {
+        question: 'Nếu quên nhập vài ngày thì sao?',
+        answer: 'Bạn có thể bổ sung giao dịch theo ngày bất cứ lúc nào. Giao diện được tối ưu để nhập bù nhanh và vẫn rõ ràng.',
+    },
+    {
+        question: 'Mình có thể xuất dữ liệu ra ngoài không?',
+        answer: 'Có. Bạn luôn có thể xuất dữ liệu khi cần để sao lưu hoặc xử lý thêm theo quy trình riêng.',
+    },
+    {
+        question: 'Spendify phù hợp cho ai?',
+        answer: 'Phù hợp cho cá nhân hoặc gia đình muốn kiểm soát chi tiêu thủ công, không cần hệ thống tài chính phức tạp.',
+    },
+    {
+        question: 'Có cần thẻ tín dụng để dùng thử không?',
+        answer: 'Không cần. Bạn có thể bắt đầu ngay mà không phải nhập thông tin thẻ.',
+    },
+];
+
 const logos = ['Stellar', 'Northwind', 'NovaPay', 'Lumen', 'Orbit', 'Finq'];
 
 export default function Index() {
     return (
-        <Layout title="FinanceFlow - Quản lý chi tiêu cá nhân" showFooter={false}>
+        <Layout title="Spendify - Quản lý chi tiêu cá nhân" showFooter={false}>
             <div className="bg-white text-slate-900">
                 <section className="relative overflow-hidden bg-white pb-16 pt-12 md:pb-24 md:pt-20">
                     <div className="absolute -top-32 right-0 h-72 w-72 rounded-full bg-sky-100/70 blur-3xl" />
@@ -172,7 +196,7 @@ export default function Index() {
                             </h1>
 
                             <p className="mb-8 text-base leading-relaxed text-slate-600 sm:text-lg">
-                                FinanceFlow được tạo ra cho nhu cầu quản lý chi tiêu thủ công đơn giản. Ghi giao dịch nhanh, theo dõi ngân sách rõ ràng,
+                                Spendify được tạo ra cho nhu cầu quản lý chi tiêu thủ công đơn giản. Ghi giao dịch nhanh, theo dõi ngân sách rõ ràng,
                                 và xem tổng hợp hằng tuần mà không bị rối bởi những thứ không cần thiết.
                             </p>
 
@@ -298,21 +322,6 @@ export default function Index() {
                                     Tiết kiệm thời gian với các mẫu có thể tùy chỉnh, rất phù hợp cho quy trình nhập thủ công.
                                 </p>
                             </div>
-                            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6 text-center">
-                                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Bộ lọc nhanh</p>
-                                <div className="mt-4 flex flex-wrap justify-center gap-2">
-                                    {['Ăn uống', 'Tiền nhà', 'Thuê bao', 'Di chuyển', 'Ăn ngoài', 'Mua sắm'].map((item) => (
-                                        <span key={item} className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600">
-                                            {item}
-                                        </span>
-                                    ))}
-                                </div>
-                                <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-4 text-center">
-                                    <p className="text-xs text-slate-400">Khoản định kỳ tiếp theo</p>
-                                    <p className="mt-2 text-lg font-bold text-slate-900">Tiền điện thoại · $64</p>
-                                    <p className="mt-1 text-xs text-slate-500">Đến hạn ngày 6/5</p>
-                                </div>
-                            </div>
                         </div>
 
                         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 lg:justify-items-center">
@@ -340,7 +349,7 @@ export default function Index() {
                                 Người thật, thói quen tốt thật
                             </h2>
                             <p className="mx-auto mt-4 max-w-2xl text-base text-slate-600">
-                                Quy trình càng đơn giản càng dễ duy trì. Đây là chia sẻ từ người dùng khi theo dõi chi tiêu thủ công cùng FinanceFlow.
+                                Quy trình càng đơn giản càng dễ duy trì. Đây là chia sẻ từ người dùng khi theo dõi chi tiêu thủ công cùng Spendify.
                             </p>
                         </div>
 
@@ -369,168 +378,72 @@ export default function Index() {
                     </div>
                 </section>
 
-                <section id="privacy" className="bg-white py-16 md:py-24">
-                    <div className="mx-auto max-w-6xl px-6 text-center">
-                        <div className="grid gap-10 lg:grid-cols-[1.1fr,1fr] lg:items-center lg:justify-items-center">
-                            <div>
-                                <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Yên tâm sử dụng</p>
-                                <h2 className="mt-3 text-3xl font-extrabold text-slate-900 md:text-4xl">
-                                    Quyền riêng tư rõ ràng, thiết kế cho quản lý thủ công
-                                </h2>
-                                <p className="mt-4 max-w-2xl text-slate-600">
-                                    Dữ liệu của bạn gọn gàng và dễ mang đi. Bạn toàn quyền quyết định nhập gì và xuất dữ liệu ra sao.
-                                </p>
+                <section id="faqs" className="bg-white py-16 md:py-24">
+                    <div className="mx-auto max-w-7xl px-6">
+                        <div className="mx-auto mb-12 max-w-3xl text-center">
+                            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Câu hỏi thường gặp</p>
+                            <h2 className="mt-3 text-3xl font-extrabold text-slate-900 md:text-4xl">
+                                Giải đáp nhanh trước khi bạn bắt đầu
+                            </h2>
+                            <p className="mx-auto mt-4 max-w-2xl text-base text-slate-600 md:text-lg">
+                                Một vài điều người dùng thường hỏi khi chuyển sang cách quản lý chi tiêu thủ công cùng Spendify.
+                            </p>
+                        </div>
 
-                                <ul className="mt-7 space-y-3 text-sm text-slate-700">
-                                    <li className="flex items-center justify-center gap-2">
-                                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-                                        Xuất CSV bất cứ lúc nào.
-                                    </li>
-                                    <li className="flex items-center justify-center gap-2">
-                                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-                                        Chỉ nhập thủ công, không kết nối ngân hàng bên ngoài.
-                                    </li>
-                                    <li className="flex items-center justify-center gap-2">
-                                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-                                        Mỗi giao dịch đều có lịch sử rõ ràng.
-                                    </li>
-                                </ul>
-
-                                <Link
-                                    href={register()}
-                                    className="mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-6 py-3 text-sm font-bold text-white transition hover:bg-slate-800"
-                                >
-                                    Bắt đầu theo dõi
-                                    <ArrowRight className="h-4 w-4" />
-                                </Link>
-                            </div>
-
-                            <div className="rounded-[2rem] border border-slate-200 bg-slate-50 p-6 text-center shadow-[0_22px_45px_-28px_rgba(15,23,42,0.25)]">
-                                <p className="text-sm font-bold uppercase tracking-wide text-slate-700">Tổng quan dữ liệu</p>
-                                <div className="mt-5 space-y-4">
-                                    {[
-                                        { label: 'Lượt xuất dữ liệu', value: '2,114' },
-                                        { label: 'Giao dịch có gắn nhãn', value: '98%' },
-                                        { label: 'Độ chính xác số dư ví', value: '99.2%' },
-                                    ].map((item) => (
-                                        <div key={item.label} className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3">
-                                            <p className="text-sm font-semibold text-slate-700">{item.label}</p>
-                                            <p className="text-sm font-bold text-slate-900">{item.value}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                                <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-4">
-                                    <div className="flex items-center justify-center gap-2 text-slate-800">
-                                        <ShieldCheck className="h-4 w-4 text-emerald-600" />
-                                        <p className="text-sm font-bold">Riêng tư mặc định</p>
-                                    </div>
-                                    <p className="mt-2 text-xs text-slate-600">Bạn chọn nội dung muốn theo dõi, tải xuống và toàn quyền kiểm soát.</p>
-                                </div>
-                            </div>
+                        <div className="mx-auto grid max-w-4xl gap-6">
+                            {faqs.map((item) => {
+                                return (
+                                    <details
+                                        key={item.question}
+                                        className="group rounded-3xl border border-slate-200 bg-white p-6 text-left shadow-[0_20px_40px_-32px_rgba(15,23,42,0.35)]"
+                                    >
+                                        <summary className="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
+                                            <h3 className="text-lg font-bold text-slate-900">{item.question}</h3>
+                                            <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-lg font-semibold text-slate-700 transition group-open:rotate-45">
+                                                +
+                                            </span>
+                                        </summary>
+                                        <p className="mt-4 pr-10 text-sm leading-relaxed text-slate-600">{item.answer}</p>
+                                    </details>
+                                );
+                            })}
                         </div>
                     </div>
                 </section>
 
-                <section id="contact" className="bg-slate-900 py-16 text-white md:py-24">
-                    <div className="mx-auto max-w-4xl px-6 text-center">
-                        <div className="rounded-[2rem] border border-white/10 bg-white/5 p-8 md:p-12">
-                            <h2 className="text-3xl font-extrabold md:text-4xl">Bắt đầu quản lý chi tiêu ngay hôm nay</h2>
-                            <p className="mx-auto mt-4 max-w-2xl text-white/70">
-                                Theo dõi thủ công đơn giản, giao diện nhẹ mắt và sự rõ ràng bạn cần mỗi tuần.
+                <section id="contact" className="border-y border-slate-100 bg-slate-50 py-16 md:py-24">
+                    <div className="mx-auto max-w-5xl px-6 text-center">
+                        <div className="p-2 md:p-4">
+                            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Bắt đầu ngay</p>
+                            <h2 className="mt-3 text-3xl font-extrabold text-slate-900 md:text-4xl">Quản lý chi tiêu rõ ràng hơn mỗi tuần</h2>
+                            <p className="mx-auto mt-4 max-w-2xl text-slate-600">
+                                Giữ cách theo dõi thủ công bạn quen thuộc, nhưng có thêm cấu trúc rõ ràng để kiểm soát ngân sách tốt hơn.
                             </p>
-                            <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+
+                            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                                 <Link
                                     href={register()}
-                                    className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-3 text-sm font-bold text-slate-900 transition hover:-translate-y-0.5 hover:bg-slate-100"
+                                    className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-7 py-3 text-sm font-bold text-white transition hover:bg-slate-800"
                                 >
-                                    Đăng ký ngay
+                                    Đăng ký miễn phí
                                     <ArrowRight className="h-4 w-4" />
                                 </Link>
                                 <Link
                                     href={expense.dashboard().url}
-                                    className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 px-7 py-3 text-sm font-semibold text-white/80 transition hover:border-white/60 hover:text-white"
+                                    className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-7 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
                                 >
-                                    Xem demo
                                     <PlayCircle className="h-4 w-4" />
+                                    Xem demo
                                 </Link>
                             </div>
-                        </div>
-                    </div>
-                </section>
 
-                <section className="border-t border-slate-200 bg-white py-12">
-                    <div className="mx-auto max-w-7xl px-6">
-                        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-5">
-                            <div className="lg:col-span-2">
-                                <p className="text-lg font-extrabold tracking-tight text-slate-900">FinanceFlow</p>
-                                <p className="mt-3 max-w-sm text-sm leading-relaxed text-slate-600">
-                                    Ứng dụng quản lý chi tiêu cá nhân theo hướng thủ công, đơn giản và rõ ràng để bạn duy trì thói quen tài chính tốt mỗi tuần.
-                                </p>
-
-                            </div>
-
-                            <div>
-                                <p className="text-xs font-semibold tracking-[0.16em] text-slate-400 uppercase">Sản phẩm</p>
-                                <div className="mt-4 space-y-2 text-sm text-slate-600">
-                                    <a href="#features" className="block transition hover:text-slate-900">
-                                        Tính năng
-                                    </a>
-                                    <a href="#how-it-works" className="block transition hover:text-slate-900">
-                                        Cách hoạt động
-                                    </a>
-                                    <a href="#templates" className="block transition hover:text-slate-900">
-                                        Mẫu có sẵn
-                                    </a>
-                                    <a href="#privacy" className="block transition hover:text-slate-900">
-                                        Quyền riêng tư
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div>
-                                <p className="text-xs font-semibold tracking-[0.16em] text-slate-400 uppercase">Tài nguyên</p>
-                                <div className="mt-4 space-y-2 text-sm text-slate-600">
-                                    <Link href={register()} className="block transition hover:text-slate-900">
-                                        Đăng ký
-                                    </Link>
-                                    <Link href={expense.dashboard().url} className="block transition hover:text-slate-900">
-                                        Xem demo
-                                    </Link>
-                                    <a href="#testimonials" className="block transition hover:text-slate-900">
-                                        Đánh giá người dùng
-                                    </a>
-                                    <a href="#contact" className="block transition hover:text-slate-900">
-                                        Liên hệ
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div>
-                                <p className="text-xs font-semibold tracking-[0.16em] text-slate-400 uppercase">Kết nối</p>
-                                <div className="mt-4 flex items-center gap-3 text-slate-500">
-                                    <a href="#" className="rounded-full border border-slate-200 p-2 transition hover:border-slate-300 hover:text-slate-900">
-                                        <Twitter className="h-4 w-4" />
-                                    </a>
-                                    <a href="#" className="rounded-full border border-slate-200 p-2 transition hover:border-slate-300 hover:text-slate-900">
-                                        <Linkedin className="h-4 w-4" />
-                                    </a>
-                                    <a href="#" className="rounded-full border border-slate-200 p-2 transition hover:border-slate-300 hover:text-slate-900">
-                                        <Github className="h-4 w-4" />
-                                    </a>
-                                </div>
-                                <p className="mt-4 text-sm text-slate-500">hello@financeflow.app</p>
-                            </div>
-                        </div>
-
-                        <div className="mt-10 border-t border-slate-200 pt-6 text-sm text-slate-500 md:flex md:items-center md:justify-between">
-                            <p>© {new Date().getFullYear()} FinanceFlow. Đã đăng ký bản quyền.</p>
-                            <div className="mt-3 flex items-center gap-4 md:mt-0">
-                                <a href="#" className="transition hover:text-slate-900">
-                                    Điều khoản
-                                </a>
-                                <a href="#" className="transition hover:text-slate-900">
-                                    Chính sách bảo mật
-                                </a>
+                            <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-slate-600">
+                                {['Không cần thẻ tín dụng', 'Thiết lập khoảng 2 phút', 'Dữ liệu luôn thuộc về bạn'].map((item) => (
+                                    <span key={item} className="inline-flex items-center gap-2">
+                                        <Check className="h-4 w-4 text-emerald-600" />
+                                        <span>{item}</span>
+                                    </span>
+                                ))}
                             </div>
                         </div>
                     </div>

@@ -1,3 +1,4 @@
+import { ChevronDown, Search, SlidersHorizontal, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -13,7 +14,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { ChevronDown, Search, SlidersHorizontal, X } from 'lucide-react';
 
 interface Column {
     id: string;

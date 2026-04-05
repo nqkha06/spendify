@@ -1,4 +1,17 @@
-import { format, parseISO } from 'date-fns';
+import { Link } from '@inertiajs/react';
+import {
+    eachDayOfInterval,
+    eachMonthOfInterval,
+    endOfMonth,
+    endOfYear,
+    format,
+    isWithinInterval,
+    parseISO,
+    startOfMonth,
+    startOfYear,
+    subMonths,
+    subYears,
+} from 'date-fns';
 import {
     ArrowDownRight,
     ArrowUpRight,
@@ -6,6 +19,7 @@ import {
     Wallet,
     DollarSign,
 } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import {
     AreaChart,
     Area,
@@ -19,48 +33,332 @@ import {
     Cell,
 } from 'recharts';
 import ExpenseLayout from '@/components/expense-tracker/layout';
-import {
-    MOCK_WALLETS,
-    MOCK_CATEGORIES,
-} from '@/lib/mock-data';
+import expense from '@/routes/expense';
 import type {
+    ExpenseCategory,
     ExpenseTransaction,
     ExpenseNavigationItem,
     ExpenseProfile,
+    ExpenseWallet,
 } from '@/types/expense-tracker';
 
-const chartData = [
-    { name: 'T1', value: 4000 },
-    { name: 'T2', value: 3000 },
-    { name: 'T3', value: 2000 },
-    { name: 'T4', value: 2780 },
-    { name: 'T5', value: 1890 },
-    { name: 'T6', value: 2390 },
-    { name: 'T7', value: 3490 },
-];
+type DashboardPeriod = 'this-month' | 'last-month' | 'this-year';
 
-const categoryData = MOCK_CATEGORIES.map((cat) => ({
-    name: cat.name,
-    value: Math.floor(Math.random() * 500) + 50,
-    color: cat.color,
-}));
+const CATEGORY_FALLBACK_COLOR = '#94a3b8';
+
+const formatCurrency = (amount: number, minimumFractionDigits = 2): string => {
+    return amount.toLocaleString('en-US', {
+        minimumFractionDigits,
+        maximumFractionDigits: minimumFractionDigits,
+    });
+};
+
+const calculateChange = (currentValue: number, previousValue: number): number | null => {
+    if (previousValue === 0) {
+        return currentValue === 0 ? 0 : null;
+    }
+
+    return ((currentValue - previousValue) / previousValue) * 100;
+};
+
+const isValidDate = (date: Date): boolean => !Number.isNaN(date.getTime());
 
 interface DashboardProps {
     navigation: ExpenseNavigationItem[];
     profile?: ExpenseProfile;
     data?: {
+        categories?: ExpenseCategory[];
+        wallets?: ExpenseWallet[];
         transactions?: ExpenseTransaction[];
     };
 }
 
 export default function Dashboard({ navigation, profile, data: pageData }: DashboardProps) {
-    const totalBalance = MOCK_WALLETS.reduce(
-        (acc, wallet) => acc + wallet.balance,
-        0,
+    const [period, setPeriod] = useState<DashboardPeriod>('this-month');
+
+    const categories = useMemo(
+        () => pageData?.categories ?? [],
+        [pageData?.categories],
     );
-    const totalIncome = 3000;
-    const totalExpense = 425.5;
-    const recentTransactions = pageData?.transactions ?? [];
+    const wallets = useMemo(
+        () => pageData?.wallets ?? [],
+        [pageData?.wallets],
+    );
+    const transactions = useMemo(
+        () => pageData?.transactions ?? [],
+        [pageData?.transactions],
+    );
+
+    const categoryMap = useMemo(
+        () => new Map(categories.map((category) => [category.id, category])),
+        [categories],
+    );
+
+    const walletMap = useMemo(
+        () => new Map(wallets.map((wallet) => [wallet.id, wallet])),
+        [wallets],
+    );
+
+    const periodRange = useMemo(() => {
+        const now = new Date();
+
+        if (period === 'this-year') {
+            return {
+                start: startOfYear(now),
+                end: endOfYear(now),
+            };
+        }
+
+        if (period === 'last-month') {
+            const previousMonth = subMonths(now, 1);
+
+            return {
+                start: startOfMonth(previousMonth),
+                end: endOfMonth(previousMonth),
+            };
+        }
+
+        return {
+            start: startOfMonth(now),
+            end: endOfMonth(now),
+        };
+    }, [period]);
+
+    const previousPeriodRange = useMemo(() => {
+        const now = new Date();
+
+        if (period === 'this-year') {
+            const previousYear = subYears(now, 1);
+
+            return {
+                start: startOfYear(previousYear),
+                end: endOfYear(previousYear),
+            };
+        }
+
+        if (period === 'last-month') {
+            const twoMonthsAgo = subMonths(now, 2);
+
+            return {
+                start: startOfMonth(twoMonthsAgo),
+                end: endOfMonth(twoMonthsAgo),
+            };
+        }
+
+        const previousMonth = subMonths(now, 1);
+
+        return {
+            start: startOfMonth(previousMonth),
+            end: endOfMonth(previousMonth),
+        };
+    }, [period]);
+
+    const transactionsInPeriod = useMemo(() => {
+        return transactions.filter((transaction) => {
+            const transactionDate = parseISO(transaction.date);
+
+            if (!isValidDate(transactionDate)) {
+                return false;
+            }
+
+            return isWithinInterval(transactionDate, periodRange);
+        });
+    }, [periodRange, transactions]);
+
+    const previousTransactionsInPeriod = useMemo(() => {
+        return transactions.filter((transaction) => {
+            const transactionDate = parseISO(transaction.date);
+
+            if (!isValidDate(transactionDate)) {
+                return false;
+            }
+
+            return isWithinInterval(transactionDate, previousPeriodRange);
+        });
+    }, [previousPeriodRange, transactions]);
+
+    const totalBalance = useMemo(
+        () => wallets.reduce((accumulator, wallet) => accumulator + wallet.balance, 0),
+        [wallets],
+    );
+
+    const totalIncome = useMemo(
+        () =>
+            transactionsInPeriod
+                .filter((transaction) => transaction.type === 'income')
+                .reduce((accumulator, transaction) => accumulator + transaction.amount, 0),
+        [transactionsInPeriod],
+    );
+
+    const totalExpense = useMemo(
+        () =>
+            transactionsInPeriod
+                .filter((transaction) => transaction.type === 'expense')
+                .reduce((accumulator, transaction) => accumulator + transaction.amount, 0),
+        [transactionsInPeriod],
+    );
+
+    const previousTotalIncome = useMemo(
+        () =>
+            previousTransactionsInPeriod
+                .filter((transaction) => transaction.type === 'income')
+                .reduce((accumulator, transaction) => accumulator + transaction.amount, 0),
+        [previousTransactionsInPeriod],
+    );
+
+    const previousTotalExpense = useMemo(
+        () =>
+            previousTransactionsInPeriod
+                .filter((transaction) => transaction.type === 'expense')
+                .reduce((accumulator, transaction) => accumulator + transaction.amount, 0),
+        [previousTransactionsInPeriod],
+    );
+
+    const incomeChange = useMemo(
+        () => calculateChange(totalIncome, previousTotalIncome),
+        [totalIncome, previousTotalIncome],
+    );
+
+    const expenseChange = useMemo(
+        () => calculateChange(totalExpense, previousTotalExpense),
+        [totalExpense, previousTotalExpense],
+    );
+
+    const chartData = useMemo(() => {
+        if (period === 'this-year') {
+            const months = eachMonthOfInterval(periodRange);
+
+            return months.map((month) => {
+                const key = format(month, 'yyyy-MM');
+
+                const value = transactionsInPeriod.reduce(
+                    (accumulator, transaction) => {
+                        const transactionDate = parseISO(transaction.date);
+
+                        if (!isValidDate(transactionDate)) {
+                            return accumulator;
+                        }
+
+                        if (format(transactionDate, 'yyyy-MM') !== key) {
+                            return accumulator;
+                        }
+
+                        const sign = transaction.type === 'income' ? 1 : -1;
+
+                        return accumulator + transaction.amount * sign;
+                    },
+                    0,
+                );
+
+                return {
+                    name: `T${format(month, 'M')}`,
+                    value,
+                };
+            });
+        }
+
+        const days = eachDayOfInterval(periodRange);
+
+        return days.map((day) => {
+            const key = format(day, 'yyyy-MM-dd');
+
+            const value = transactionsInPeriod.reduce((accumulator, transaction) => {
+                const transactionDate = parseISO(transaction.date);
+
+                if (!isValidDate(transactionDate)) {
+                    return accumulator;
+                }
+
+                if (format(transactionDate, 'yyyy-MM-dd') !== key) {
+                    return accumulator;
+                }
+
+                const sign = transaction.type === 'income' ? 1 : -1;
+
+                return accumulator + transaction.amount * sign;
+            }, 0);
+
+            return {
+                name: format(day, 'dd/MM'),
+                value,
+            };
+        });
+    }, [period, periodRange, transactionsInPeriod]);
+
+    const categoryData = useMemo(() => {
+        const expenseTotalsByCategory = new Map<string, number>();
+
+        transactionsInPeriod
+            .filter((transaction) => transaction.type === 'expense')
+            .forEach((transaction) => {
+                const key = transaction.categoryId || 'uncategorized';
+                const currentAmount = expenseTotalsByCategory.get(key) ?? 0;
+
+                expenseTotalsByCategory.set(key, currentAmount + transaction.amount);
+            });
+
+        const dataset = [...expenseTotalsByCategory.entries()]
+            .map(([categoryId, value]) => {
+                const category = categoryMap.get(categoryId);
+
+                if (categoryId === 'uncategorized' || category === undefined) {
+                    return {
+                        name: 'Không phân loại',
+                        value,
+                        color: CATEGORY_FALLBACK_COLOR,
+                    };
+                }
+
+                return {
+                    name: category.name,
+                    value,
+                    color: category.color,
+                };
+            })
+            .sort((a, b) => b.value - a.value);
+
+        return dataset;
+    }, [categoryMap, transactionsInPeriod]);
+
+    const recentTransactions = useMemo(
+        () =>
+            transactions
+                .slice()
+                .sort(
+                    (a, b) =>
+                        new Date(b.date).getTime() -
+                        new Date(a.date).getTime(),
+                )
+                .slice(0, 10),
+        [transactions],
+    );
+
+    const periodLabel =
+        period === 'this-month'
+            ? 'so với tháng trước'
+            : period === 'last-month'
+              ? 'so với tháng liền trước'
+              : 'so với năm trước';
+
+    const formatChangeLabel = (change: number | null): string => {
+        if (change === null) {
+            return 'Chưa có dữ liệu so sánh';
+        }
+
+        const sign = change >= 0 ? '+' : '';
+
+        return `${sign}${change.toFixed(1)}%`;
+    };
+
+    const formatDate = (value: string): string => {
+        const date = parseISO(value);
+
+        if (!isValidDate(date)) {
+            return value;
+        }
+
+        return format(date, 'dd/MM/yyyy');
+    };
 
     return (
         <ExpenseLayout
@@ -72,10 +370,16 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
             profile={profile}
             action={
                 <div>
-                    <select className="block rounded-lg border border-slate-200 bg-white p-2 text-sm font-medium text-slate-700 shadow-sm focus:border-primary-500 focus:ring-primary-500">
-                        <option>Tháng này</option>
-                        <option>Tháng trước</option>
-                        <option>Năm nay</option>
+                    <select
+                        value={period}
+                        onChange={(event) =>
+                            setPeriod(event.target.value as DashboardPeriod)
+                        }
+                        className="block rounded-lg border border-slate-200 bg-white p-2 text-sm font-medium text-slate-700 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    >
+                        <option value="this-month">Tháng này</option>
+                        <option value="last-month">Tháng trước</option>
+                        <option value="this-year">Năm nay</option>
                     </select>
                 </div>
             }
@@ -91,23 +395,15 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
                                 </p>
                                 <h3 className="text-3xl font-bold text-slate-900">
                                     $
-                                    {totalBalance.toLocaleString('en-US', {
-                                        minimumFractionDigits: 2,
-                                    })}
+                                    {formatCurrency(totalBalance)}
                                 </h3>
                             </div>
                             <div className="rounded-xl bg-primary-50 p-3 text-primary-600">
                                 <Wallet className="h-6 w-6" />
                             </div>
                         </div>
-                        <div className="mt-4 flex items-center text-sm">
-                            <TrendingUp className="mr-1 h-4 w-4 text-success-500" />
-                            <span className="font-medium text-success-500">
-                                +2.5%
-                            </span>
-                            <span className="ml-2 text-slate-400">
-                                so với tháng trước
-                            </span>
+                        <div className="mt-4 text-sm text-slate-400">
+                            Cập nhật theo số dư ví hiện tại
                         </div>
                     </div>
 
@@ -119,9 +415,7 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
                                 </p>
                                 <h3 className="text-3xl font-bold text-slate-900">
                                     $
-                                    {totalIncome.toLocaleString('en-US', {
-                                        minimumFractionDigits: 2,
-                                    })}
+                                    {formatCurrency(totalIncome)}
                                 </h3>
                             </div>
                             <div className="rounded-xl bg-success-50 p-3 text-success-600">
@@ -131,10 +425,10 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
                         <div className="mt-4 flex items-center text-sm">
                             <TrendingUp className="mr-1 h-4 w-4 text-success-500" />
                             <span className="font-medium text-success-500">
-                                +12%
+                                {formatChangeLabel(incomeChange)}
                             </span>
                             <span className="ml-2 text-slate-400">
-                                so với tháng trước
+                                {periodLabel}
                             </span>
                         </div>
                     </div>
@@ -147,9 +441,7 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
                                 </p>
                                 <h3 className="text-3xl font-bold text-slate-900">
                                     $
-                                    {totalExpense.toLocaleString('en-US', {
-                                        minimumFractionDigits: 2,
-                                    })}
+                                    {formatCurrency(totalExpense)}
                                 </h3>
                             </div>
                             <div className="rounded-xl bg-danger-50 p-3 text-danger-600">
@@ -159,10 +451,10 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
                         <div className="mt-4 flex items-center text-sm">
                             <TrendingUp className="mr-1 h-4 w-4 text-danger-500" />
                             <span className="font-medium text-danger-500">
-                                +5.4%
+                                {formatChangeLabel(expenseChange)}
                             </span>
                             <span className="ml-2 text-slate-400">
-                                so với tháng trước
+                                {periodLabel}
                             </span>
                         </div>
                     </div>
@@ -221,7 +513,9 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
                                         axisLine={false}
                                         tickLine={false}
                                         tick={{ fill: '#64748b', fontSize: 12 }}
-                                        tickFormatter={(value) => `$${value}`}
+                                        tickFormatter={(value: number) =>
+                                            `$${value}`
+                                        }
                                     />
                                     <Tooltip
                                         contentStyle={{
@@ -281,8 +575,8 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
                                                 '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                                         }}
                                         itemStyle={{ fontWeight: 500 }}
-                                        formatter={(value: any) => [
-                                            `$${value}`,
+                                        formatter={(value: number | string | undefined) => [
+                                            `$${formatCurrency(Number(value ?? 0))}`,
                                             'Số tiền',
                                         ]}
                                     />
@@ -291,9 +585,7 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
                             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
                                 <span className="text-2xl font-bold text-slate-900">
                                     $
-                                    {totalExpense.toLocaleString('en-US', {
-                                        minimumFractionDigits: 0,
-                                    })}
+                                    {formatCurrency(totalExpense, 0)}
                                 </span>
                                 <span className="text-xs font-medium tracking-wider text-slate-500 uppercase">
                                     Tổng
@@ -318,10 +610,15 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
                                         </span>
                                     </div>
                                     <span className="font-bold text-slate-900">
-                                        ${category.value}
+                                        ${formatCurrency(category.value)}
                                     </span>
                                 </div>
                             ))}
+                            {categoryData.length === 0 ? (
+                                <p className="text-sm text-slate-500">
+                                    Chưa có dữ liệu chi tiêu trong kỳ đã chọn.
+                                </p>
+                            ) : null}
                         </div>
                     </div>
                 </div>
@@ -332,9 +629,12 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
                         <h3 className="text-lg font-bold tracking-tight text-slate-900">
                             Giao dịch gần đây
                         </h3>
-                        <button className="hover:text-primary-700 text-sm font-medium text-primary-600 transition-colors">
+                        <Link
+                            href={expense.transactions().url}
+                            className="hover:text-primary-700 text-sm font-medium text-primary-600 transition-colors"
+                        >
                             Xem tất cả
-                        </button>
+                        </Link>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-sm whitespace-nowrap">
@@ -361,19 +661,12 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100 text-slate-700">
-                                {recentTransactions
-                                    .slice()
-                                    .sort(
-                                        (a, b) =>
-                                            new Date(b.date).getTime() -
-                                            new Date(a.date).getTime(),
-                                    )
-                                    .map((tx) => {
-                                        const category = MOCK_CATEGORIES.find(
-                                            (c) => c.id === tx.categoryId,
+                                {recentTransactions.map((tx) => {
+                                        const category = categoryMap.get(
+                                            tx.categoryId,
                                         );
-                                        const wallet = MOCK_WALLETS.find(
-                                            (w) => w.id === tx.walletId,
+                                        const wallet = walletMap.get(
+                                            tx.walletId,
                                         );
                                         const isIncome = tx.type === 'income';
                                         return (
@@ -406,23 +699,18 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 text-slate-500">
-                                                    {format(
-                                                        parseISO(tx.date),
-                                                        'dd/MM/yyyy',
-                                                    )}
+                                                    {formatDate(tx.date)}
                                                 </td>
                                                 <td className="px-6 py-4 text-slate-500">
-                                                    {wallet?.name}
+                                                    {wallet?.name ??
+                                                        'Không xác định'}
                                                 </td>
                                                 <td
                                                     className={`px-6 py-4 text-right font-bold ${isIncome ? 'text-success-600' : 'text-slate-900'}`}
                                                 >
                                                     {isIncome ? '+' : '-'}$
-                                                    {tx.amount.toLocaleString(
-                                                        'en-US',
-                                                        {
-                                                            minimumFractionDigits: 2,
-                                                        },
+                                                    {formatCurrency(
+                                                        tx.amount,
                                                     )}
                                                 </td>
                                             </tr>
@@ -434,7 +722,7 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
                                             colSpan={5}
                                             className="px-6 py-12 text-center text-slate-500"
                                         >
-                                            Chua co giao dich nao.
+                                            Chưa có giao dịch nào.
                                         </td>
                                     </tr>
                                 ) : null}

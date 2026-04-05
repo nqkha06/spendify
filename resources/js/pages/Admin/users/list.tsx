@@ -1,11 +1,11 @@
-import AdminLayout from '@/layouts/admin';
-import adminUsers from '@/routes/admin/users';
-import { type BreadcrumbItem, type User } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { DataTable } from '@/components/data-table';
-import { UsersPrimaryButtons } from './components/users-primary-buttons';
+import AdminLayout from '@/layouts/admin';
+import adminUsers from '@/routes/admin/users';
+import type {BreadcrumbItem, User} from '@/types';
 import { DeleteUserDialog } from './components/users-dialogs';
+import { UsersPrimaryButtons } from './components/users-primary-buttons';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
