@@ -33,6 +33,7 @@ export interface ExpenseTransaction {
     date: string;
     note?: string;
     labels?: string[];
+    status?: 'posted' | 'pending' | 'cancelled';
 }
 
 export interface ExpenseBudget {

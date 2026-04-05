@@ -1,6 +1,8 @@
+import { Head, Link, usePage } from '@inertiajs/react';
+import { Wallet, Facebook, Twitter, Instagram, Lock, ChevronUp } from 'lucide-react';
 import React, { useEffect } from 'react';
-import { Head, Link } from '@inertiajs/react';
-import { Wallet, ArrowRight, Facebook, Twitter, Instagram, Lock, ChevronUp } from 'lucide-react';
+import { login, register } from '@/routes';
+import expense from '@/routes/expense';
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -13,6 +15,13 @@ export default function Layout({
     title = 'Backcash - Earn Cashback Everywhere',
     showFooter = true,
 }: LayoutProps) {
+    const { auth } = usePage().props as {
+        auth?: {
+            user?: unknown | null;
+        };
+    };
+    const isAuthenticated = Boolean(auth?.user);
+
     useEffect(() => {
         const backToTopBtn = document.getElementById('backToTop');
         const handleScroll = () => {
@@ -60,10 +69,18 @@ export default function Layout({
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <Link href="/login" className="hidden sm:block font-medium text-slate-600 hover:text-brand-600 transition-colors">Log in</Link>
-                        <Link href="/register" className="bg-slate-900 hover:bg-slate-800 text-white px-6 py-2.5 rounded-full font-medium transition-colors shadow-sm">
-                            Sign up free
-                        </Link>
+                        {isAuthenticated ? (
+                            <Link href={expense.dashboard().url} className="bg-slate-900 hover:bg-slate-800 text-white px-6 py-2.5 rounded-full font-medium transition-colors shadow-sm">
+                                Dashboard
+                            </Link>
+                        ) : (
+                            <>
+                                <Link href={login()} className="hidden sm:block font-medium text-slate-600 hover:text-brand-600 transition-colors">Log in</Link>
+                                <Link href={register()} className="bg-slate-900 hover:bg-slate-800 text-white px-6 py-2.5 rounded-full font-medium transition-colors shadow-sm">
+                                    Sign up free
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
             </nav>

@@ -14,16 +14,16 @@ class ExpenseBudgetsController extends Controller
 
         return Inertia::render('User/Budgets', [
             'navigation' => [
-                ['label' => 'Dashboard', 'href' => route('expense.dashboard')],
-                ['label' => 'Transactions', 'href' => route('expense.transactions')],
-                ['label' => 'Budgets', 'href' => route('expense.budgets')],
-                ['label' => 'Wallets', 'href' => route('expense.wallets')],
-                ['label' => 'Settings', 'href' => route('expense.settings')],
+                ['label' => 'Tổng quan', 'href' => route('expense.dashboard')],
+                ['label' => 'Giao dịch', 'href' => route('expense.transactions')],
+                ['label' => 'Ngân sách', 'href' => route('expense.budgets')],
+                ['label' => 'Ví tiền', 'href' => route('expense.wallets')],
+                ['label' => 'Cài đặt', 'href' => route('expense.settings')],
             ],
             'profile' => [
-                'name' => $user?->name ?? 'Guest',
-                'email' => $user?->email ?? 'guest@example.com',
-                'initials' => collect(explode(' ', (string) ($user?->name ?? 'Guest')))
+                'name' => $user?->name ?? 'Khách',
+                'email' => $user?->email ?? 'khach@example.com',
+                'initials' => collect(explode(' ', (string) ($user?->name ?? 'Khách')))
                     ->filter()
                     ->take(2)
                     ->map(fn (string $part): string => strtoupper(substr($part, 0, 1)))

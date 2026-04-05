@@ -1,18 +1,23 @@
-import type { ExpenseBudget, ExpenseCategory, ExpenseTransaction, ExpenseWallet } from '@/types/expense-tracker';
+import type {
+    ExpenseBudget,
+    ExpenseCategory,
+    ExpenseTransaction,
+    ExpenseWallet,
+} from '@/types/expense-tracker';
 
 export const MOCK_CATEGORIES: ExpenseCategory[] = [
-    { id: 'cat-food', name: 'Food & Drink', color: '#f97316' },
-    { id: 'cat-transport', name: 'Transport', color: '#0ea5e9' },
-    { id: 'cat-shopping', name: 'Shopping', color: '#a855f7' },
-    { id: 'cat-bills', name: 'Bills & Utilities', color: '#ef4444' },
-    { id: 'cat-salary', name: 'Salary', color: '#10b981' },
-    { id: 'cat-freelance', name: 'Freelance', color: '#22c55e' },
+    { id: 'cat-food', name: 'Ăn uống', color: '#f97316' },
+    { id: 'cat-transport', name: 'Di chuyển', color: '#0ea5e9' },
+    { id: 'cat-shopping', name: 'Mua sắm', color: '#a855f7' },
+    { id: 'cat-bills', name: 'Hóa đơn & tiện ích', color: '#ef4444' },
+    { id: 'cat-salary', name: 'Lương', color: '#10b981' },
+    { id: 'cat-freelance', name: 'Làm tự do', color: '#22c55e' },
 ];
 
 export const MOCK_WALLETS: ExpenseWallet[] = [
     {
         id: 'wallet-cash',
-        name: 'Cash Wallet',
+        name: 'Ví tiền mặt',
         balance: 1250.5,
         type: 'cash',
         currency: 'USD',
@@ -27,7 +32,7 @@ export const MOCK_WALLETS: ExpenseWallet[] = [
     },
     {
         id: 'wallet-credit',
-        name: 'Credit Card',
+        name: 'Thẻ tín dụng',
         balance: -620.35,
         type: 'credit',
         currency: 'USD',
@@ -42,8 +47,8 @@ export const MOCK_TRANSACTIONS: ExpenseTransaction[] = [
         categoryId: 'cat-salary',
         walletId: 'wallet-bank',
         date: '2026-03-12',
-        note: 'Monthly salary',
-        labels: ['payroll'],
+        note: 'Lương tháng',
+        labels: ['luong'],
     },
     {
         id: 'tx-1002',
@@ -52,7 +57,7 @@ export const MOCK_TRANSACTIONS: ExpenseTransaction[] = [
         categoryId: 'cat-food',
         walletId: 'wallet-cash',
         date: '2026-03-13',
-        note: 'Lunch with team',
+        note: 'Ăn trưa cùng nhóm',
     },
     {
         id: 'tx-1003',
@@ -61,7 +66,7 @@ export const MOCK_TRANSACTIONS: ExpenseTransaction[] = [
         categoryId: 'cat-transport',
         walletId: 'wallet-cash',
         date: '2026-03-14',
-        note: 'Grab ride',
+        note: 'Đi Grab',
     },
     {
         id: 'tx-1004',
@@ -70,8 +75,8 @@ export const MOCK_TRANSACTIONS: ExpenseTransaction[] = [
         categoryId: 'cat-bills',
         walletId: 'wallet-bank',
         date: '2026-03-15',
-        note: 'Internet bill',
-        labels: ['utility'],
+        note: 'Tiền internet',
+        labels: ['tienich'],
     },
     {
         id: 'tx-1005',
@@ -80,7 +85,7 @@ export const MOCK_TRANSACTIONS: ExpenseTransaction[] = [
         categoryId: 'cat-freelance',
         walletId: 'wallet-bank',
         date: '2026-03-16',
-        note: 'Landing page project',
+        note: 'Dự án landing page',
     },
     {
         id: 'tx-1006',
@@ -89,7 +94,7 @@ export const MOCK_TRANSACTIONS: ExpenseTransaction[] = [
         categoryId: 'cat-shopping',
         walletId: 'wallet-credit',
         date: '2026-03-18',
-        note: 'Sneakers',
+        note: 'Giày thể thao',
     },
 ];
 

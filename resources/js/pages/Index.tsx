@@ -1,7 +1,4 @@
-import Layout from '@/components/Layout';
 import { Link } from '@inertiajs/react';
-import { register } from '@/routes';
-import expense from '@/routes/expense';
 import {
     ArrowRight,
     BarChart3,
@@ -22,129 +19,132 @@ import {
     Twitter,
     Wallet,
 } from 'lucide-react';
+import Layout from '@/components/Layout';
+import { register } from '@/routes';
+import expense from '@/routes/expense';
 
 const highlights = [
     {
-        label: 'Entries logged',
+        label: 'Giao dịch đã ghi',
         value: '128K+',
-        note: 'Monthly by users',
+        note: 'Mỗi tháng từ người dùng',
     },
     {
-        label: 'Avg. time to add',
+        label: 'Thời gian thêm trung bình',
         value: '38s',
-        note: 'Per transaction',
+        note: 'Cho mỗi giao dịch',
     },
     {
-        label: 'Budget success',
+        label: 'Tỷ lệ đạt ngân sách',
         value: '72%',
-        note: 'Stay on track',
+        note: 'Giữ chi tiêu đúng kế hoạch',
     },
 ];
 
 const features = [
     {
         icon: CircleDollarSign,
-        title: 'Manual entry in seconds',
-        description: 'Quick add with smart defaults for amount, category, and wallet.',
+        title: 'Nhập thủ công trong vài giây',
+        description: 'Thêm nhanh với giá trị gợi ý thông minh cho số tiền, danh mục và ví.',
     },
     {
         icon: Target,
-        title: 'Flexible budgets',
-        description: 'Set monthly targets and see your remaining balance at a glance.',
+        title: 'Ngân sách linh hoạt',
+        description: 'Đặt mục tiêu theo tháng và xem ngay số còn lại chỉ trong một màn hình.',
     },
     {
         icon: BarChart3,
-        title: 'Clear reports',
-        description: 'Weekly and monthly summaries you can understand instantly.',
+        title: 'Báo cáo rõ ràng',
+        description: 'Tổng hợp theo tuần và tháng, dễ hiểu ngay từ cái nhìn đầu tiên.',
     },
     {
         icon: Wallet,
-        title: 'Wallet control',
-        description: 'Track cash, cards, and bank balances manually in one place.',
+        title: 'Kiểm soát ví tiền',
+        description: 'Theo dõi tiền mặt, thẻ và tài khoản ngân hàng thủ công tại một nơi.',
     },
     {
         icon: LineChart,
-        title: 'Goal tracking',
-        description: 'Save for what matters with progress updates each week.',
+        title: 'Theo dõi mục tiêu',
+        description: 'Tích lũy cho điều quan trọng với tiến độ được cập nhật mỗi tuần.',
     },
     {
         icon: PieChart,
-        title: 'Category insights',
-        description: 'Spot patterns fast with clean category breakdowns.',
+        title: 'Phân tích theo danh mục',
+        description: 'Nhìn ra xu hướng chi tiêu nhanh với biểu đồ danh mục rõ ràng.',
     },
 ];
 
 const steps = [
     {
         icon: Wallet,
-        title: 'Create wallets',
-        description: 'Add cash, cards, or bank balances manually in seconds.',
+        title: 'Tạo ví',
+        description: 'Thêm tiền mặt, thẻ hoặc số dư ngân hàng thủ công chỉ trong vài giây.',
     },
     {
         icon: CreditCard,
-        title: 'Log transactions',
-        description: 'Type in expenses and income with smart, reusable categories.',
+        title: 'Ghi giao dịch',
+        description: 'Nhập khoản thu chi với danh mục thông minh, có thể dùng lại.',
     },
     {
         icon: TrendingUp,
-        title: 'Review weekly',
-        description: 'Check budgets and summaries to keep your spending on track.',
+        title: 'Rà soát hàng tuần',
+        description: 'Kiểm tra ngân sách và tổng hợp để luôn bám sát kế hoạch chi tiêu.',
     },
 ];
 
 const templates = [
     {
         icon: Landmark,
-        title: 'Category presets',
-        description: 'Groceries, rent, utilities, subscriptions, and more.',
+        title: 'Mẫu danh mục có sẵn',
+        description: 'Ăn uống, tiền nhà, tiện ích, thuê bao và nhiều danh mục khác.',
     },
     {
         icon: CircleDollarSign,
-        title: 'Recurring items',
-        description: 'Bills and income that repeat monthly with one tap.',
+        title: 'Khoản định kỳ',
+        description: 'Hóa đơn và thu nhập lặp lại theo tháng chỉ với một chạm.',
     },
     {
         icon: Sparkles,
-        title: 'Smart notes',
-        description: 'Add tags and short notes for better recall later.',
+        title: 'Ghi chú thông minh',
+        description: 'Thêm nhãn và ghi chú ngắn để dễ tra cứu lại sau này.',
     },
     {
         icon: ShieldCheck,
-        title: 'Private by default',
-        description: 'Your data stays with you. Export anytime.',
+        title: 'Riêng tư mặc định',
+        description: 'Dữ liệu luôn thuộc về bạn. Xuất ra bất cứ lúc nào.',
     },
 ];
 
 const testimonials = [
     {
         name: 'Sophie Tran',
-        role: 'Product Designer',
+        role: 'Nhà thiết kế sản phẩm',
         avatar: 'https://i.pravatar.cc/100?img=47',
-        content: 'Manual entry actually feels relaxing here. I know exactly what I spent and why.',
+        content: 'Nhập thủ công ở đây thật sự nhẹ đầu. Tôi biết chính xác mình đã chi gì và vì sao.',
     },
     {
         name: 'Daniel Kim',
-        role: 'Freelance Developer',
+        role: 'Lập trình viên tự do',
         avatar: 'https://i.pravatar.cc/100?img=12',
-        content: 'The weekly recap keeps me honest. It is simple and fast to keep up.',
+        content: 'Bản tổng hợp hàng tuần giúp tôi kỷ luật hơn. Mọi thứ đơn giản và rất nhanh để theo dõi.',
     },
     {
         name: 'Mia Nguyen',
-        role: 'Marketing Manager',
+        role: 'Quản lý marketing',
         avatar: 'https://i.pravatar.cc/100?img=5',
-        content: 'Clean layout, no noise, just the info I need to make decisions.',
+        content: 'Bố cục gọn gàng, không rối mắt, chỉ có thông tin tôi cần để ra quyết định.',
     },
     {
         name: 'Alex Rivera',
-        role: 'Startup Founder',
+        role: 'Nhà sáng lập startup',
         avatar: 'https://i.pravatar.cc/100?img=33',
-        content: 'Categories are thoughtful and the design keeps me focused.',
+        content: 'Danh mục được thiết kế hợp lý và giao diện giúp tôi luôn tập trung.',
     },
     {
         name: 'Priya Patel',
-        role: 'Operations Lead',
+        role: 'Trưởng bộ phận vận hành',
         avatar: 'https://i.pravatar.cc/100?img=31',
-        content: 'Budget checks are clear and quick. I open it every Monday.',
+        content: 'Kiểm tra ngân sách rất rõ ràng và nhanh. Thứ Hai nào tôi cũng mở xem.',
     },
 ];
 
@@ -154,7 +154,7 @@ const logos = ['Stellar', 'Northwind', 'NovaPay', 'Lumen', 'Orbit', 'Finq'];
 
 export default function Index() {
     return (
-        <Layout title="FinanceFlow - Personal Finance Management" showFooter={false}>
+        <Layout title="FinanceFlow - Quản lý chi tiêu cá nhân" showFooter={false}>
             <div className="bg-white text-slate-900">
                 <section className="relative overflow-hidden bg-white pb-16 pt-12 md:pb-24 md:pt-20">
                     <div className="absolute -top-32 right-0 h-72 w-72 rounded-full bg-sky-100/70 blur-3xl" />
@@ -164,16 +164,16 @@ export default function Index() {
                         <div className="mx-auto max-w-xl text-center">
                             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 shadow-sm">
                                 <Sparkles className="h-4 w-4 text-slate-700" />
-                                Simple manual tracking
+                                Theo dõi thủ công đơn giản
                             </div>
 
                             <h1 className="mb-5 text-4xl font-extrabold leading-tight text-slate-900 sm:text-5xl lg:text-6xl">
-                                A clean, calm way to track your money
+                                Cách theo dõi tiền bạc gọn gàng, nhẹ đầu
                             </h1>
 
                             <p className="mb-8 text-base leading-relaxed text-slate-600 sm:text-lg">
-                                FinanceFlow is built for simple, manual tracking. Add entries fast, keep budgets visible, and review weekly summaries
-                                without extra noise.
+                                FinanceFlow được tạo ra cho nhu cầu quản lý chi tiêu thủ công đơn giản. Ghi giao dịch nhanh, theo dõi ngân sách rõ ràng,
+                                và xem tổng hợp hằng tuần mà không bị rối bởi những thứ không cần thiết.
                             </p>
 
                             <div className="flex flex-col gap-3 sm:flex-row sm:items-center justify-center">
@@ -181,7 +181,7 @@ export default function Index() {
                                     href={register()}
                                     className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-slate-900/20 transition hover:-translate-y-0.5 hover:bg-slate-800"
                                 >
-                                    Get Started Free
+                                    Bắt đầu miễn phí
                                     <ArrowRight className="h-4 w-4" />
                                 </Link>
                                 <Link
@@ -189,15 +189,15 @@ export default function Index() {
                                     className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50"
                                 >
                                     <PlayCircle className="h-4 w-4" />
-                                    View Live Demo
+                                    Xem demo trực tiếp
                                 </Link>
                             </div>
 
                             <div className="mt-8 grid gap-3 text-sm text-slate-600">
                                 {[
-                                    'No bank connections needed',
-                                    'Fully manual input with smart defaults',
-                                    'Export your data anytime',
+                                    'Không cần kết nối tài khoản ngân hàng',
+                                    'Nhập thủ công hoàn toàn với gợi ý thông minh',
+                                    'Xuất dữ liệu bất cứ lúc nào',
                                 ].map((item) => (
                                     <div key={item} className="flex items-center justify-center gap-2">
                                         <Check className="h-4 w-4 text-emerald-500" />
@@ -229,12 +229,12 @@ export default function Index() {
                 <section id="features" className="bg-white py-16 md:py-24">
                     <div className="mx-auto max-w-7xl px-6 text-center">
                         <div className="mx-auto mb-12 max-w-2xl">
-                            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Core features</p>
+                            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Tính năng cốt lõi</p>
                             <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">
-                                Everything you need for manual tracking
+                                Đủ mọi thứ bạn cần để quản lý thủ công
                             </h2>
                             <p className="mt-4 text-base text-slate-600 md:text-lg">
-                                No integrations. No noise. Just the essentials to keep your spending under control.
+                                Không tích hợp rườm rà. Không dư thừa. Chỉ giữ lại những gì cần thiết để kiểm soát chi tiêu.
                             </p>
                         </div>
 
@@ -261,10 +261,10 @@ export default function Index() {
                 <section id="how-it-works" className="bg-slate-50 py-16 md:py-24">
                     <div className="mx-auto max-w-7xl px-6 text-center">
                         <div className="mb-12 text-center">
-                            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">How it works</p>
-                            <h2 className="mt-3 text-3xl font-extrabold text-slate-900 md:text-4xl">Three steps to financial calm</h2>
+                            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Cách hoạt động</p>
+                            <h2 className="mt-3 text-3xl font-extrabold text-slate-900 md:text-4xl">3 bước để quản lý chi tiêu nhẹ nhàng</h2>
                             <p className="mx-auto mt-4 max-w-2xl text-base text-slate-600">
-                                Log, review, and improve. It stays simple because it is manual.
+                                Ghi lại, rà soát, rồi cải thiện. Mọi thứ luôn đơn giản vì bạn chủ động nhập liệu.
                             </p>
                         </div>
 
@@ -292,25 +292,25 @@ export default function Index() {
                     <div className="mx-auto max-w-7xl px-6 text-center">
                         <div className="mb-12 grid gap-6 lg:grid-cols-[1.1fr,0.9fr] lg:items-center lg:justify-items-center">
                             <div>
-                                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Templates</p>
-                                <h2 className="mt-3 text-3xl font-extrabold text-slate-900 md:text-4xl">Preset categories and recurring items</h2>
+                                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Mẫu có sẵn</p>
+                                <h2 className="mt-3 text-3xl font-extrabold text-slate-900 md:text-4xl">Danh mục gợi ý và khoản chi định kỳ</h2>
                                 <p className="mt-4 text-base text-slate-600">
-                                    Save time with presets you can customize. Great for manual entry workflows.
+                                    Tiết kiệm thời gian với các mẫu có thể tùy chỉnh, rất phù hợp cho quy trình nhập thủ công.
                                 </p>
                             </div>
                             <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6 text-center">
-                                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Quick filters</p>
+                                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Bộ lọc nhanh</p>
                                 <div className="mt-4 flex flex-wrap justify-center gap-2">
-                                    {['Groceries', 'Rent', 'Subscriptions', 'Transport', 'Dining', 'Shopping'].map((item) => (
+                                    {['Ăn uống', 'Tiền nhà', 'Thuê bao', 'Di chuyển', 'Ăn ngoài', 'Mua sắm'].map((item) => (
                                         <span key={item} className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600">
                                             {item}
                                         </span>
                                     ))}
                                 </div>
                                 <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-4 text-center">
-                                    <p className="text-xs text-slate-400">Next recurring</p>
-                                    <p className="mt-2 text-lg font-bold text-slate-900">Phone bill · $64</p>
-                                    <p className="mt-1 text-xs text-slate-500">Due May 6</p>
+                                    <p className="text-xs text-slate-400">Khoản định kỳ tiếp theo</p>
+                                    <p className="mt-2 text-lg font-bold text-slate-900">Tiền điện thoại · $64</p>
+                                    <p className="mt-1 text-xs text-slate-500">Đến hạn ngày 6/5</p>
                                 </div>
                             </div>
                         </div>
@@ -335,12 +335,12 @@ export default function Index() {
                 <section id="testimonials" className="bg-slate-50 py-16 md:py-24">
                     <div className="mx-auto max-w-7xl px-6 text-center">
                         <div className="mb-10 text-center">
-                            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Customer love</p>
+                            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Người dùng yêu thích</p>
                             <h2 className="mt-3 text-3xl font-extrabold text-slate-900 md:text-4xl">
-                                Real people, consistent habits
+                                Người thật, thói quen tốt thật
                             </h2>
                             <p className="mx-auto mt-4 max-w-2xl text-base text-slate-600">
-                                The simplest workflow wins. Here is what users say about manual tracking with FinanceFlow.
+                                Quy trình càng đơn giản càng dễ duy trì. Đây là chia sẻ từ người dùng khi theo dõi chi tiêu thủ công cùng FinanceFlow.
                             </p>
                         </div>
 
@@ -373,26 +373,26 @@ export default function Index() {
                     <div className="mx-auto max-w-6xl px-6 text-center">
                         <div className="grid gap-10 lg:grid-cols-[1.1fr,1fr] lg:items-center lg:justify-items-center">
                             <div>
-                                <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Peace of mind</p>
+                                <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Yên tâm sử dụng</p>
                                 <h2 className="mt-3 text-3xl font-extrabold text-slate-900 md:text-4xl">
-                                    Simple privacy, built for manual tracking
+                                    Quyền riêng tư rõ ràng, thiết kế cho quản lý thủ công
                                 </h2>
                                 <p className="mt-4 max-w-2xl text-slate-600">
-                                    Your data stays focused and portable. You control what you enter and how you export it.
+                                    Dữ liệu của bạn gọn gàng và dễ mang đi. Bạn toàn quyền quyết định nhập gì và xuất dữ liệu ra sao.
                                 </p>
 
                                 <ul className="mt-7 space-y-3 text-sm text-slate-700">
                                     <li className="flex items-center justify-center gap-2">
                                         <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-                                        Export to CSV anytime.
+                                        Xuất CSV bất cứ lúc nào.
                                     </li>
                                     <li className="flex items-center justify-center gap-2">
                                         <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-                                        Manual inputs only, no external bank connections.
+                                        Chỉ nhập thủ công, không kết nối ngân hàng bên ngoài.
                                     </li>
                                     <li className="flex items-center justify-center gap-2">
                                         <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-                                        Clear audit trail for every entry.
+                                        Mỗi giao dịch đều có lịch sử rõ ràng.
                                     </li>
                                 </ul>
 
@@ -400,18 +400,18 @@ export default function Index() {
                                     href={register()}
                                     className="mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-6 py-3 text-sm font-bold text-white transition hover:bg-slate-800"
                                 >
-                                    Start Tracking
+                                    Bắt đầu theo dõi
                                     <ArrowRight className="h-4 w-4" />
                                 </Link>
                             </div>
 
                             <div className="rounded-[2rem] border border-slate-200 bg-slate-50 p-6 text-center shadow-[0_22px_45px_-28px_rgba(15,23,42,0.25)]">
-                                <p className="text-sm font-bold uppercase tracking-wide text-slate-700">Data snapshot</p>
+                                <p className="text-sm font-bold uppercase tracking-wide text-slate-700">Tổng quan dữ liệu</p>
                                 <div className="mt-5 space-y-4">
                                     {[
-                                        { label: 'Exports generated', value: '2,114' },
-                                        { label: 'Entries tagged', value: '98%' },
-                                        { label: 'Wallet accuracy', value: '99.2%' },
+                                        { label: 'Lượt xuất dữ liệu', value: '2,114' },
+                                        { label: 'Giao dịch có gắn nhãn', value: '98%' },
+                                        { label: 'Độ chính xác số dư ví', value: '99.2%' },
                                     ].map((item) => (
                                         <div key={item.label} className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3">
                                             <p className="text-sm font-semibold text-slate-700">{item.label}</p>
@@ -422,9 +422,9 @@ export default function Index() {
                                 <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-4">
                                     <div className="flex items-center justify-center gap-2 text-slate-800">
                                         <ShieldCheck className="h-4 w-4 text-emerald-600" />
-                                        <p className="text-sm font-bold">Private by default</p>
+                                        <p className="text-sm font-bold">Riêng tư mặc định</p>
                                     </div>
-                                    <p className="mt-2 text-xs text-slate-600">You choose what to track. Download and keep full control.</p>
+                                    <p className="mt-2 text-xs text-slate-600">Bạn chọn nội dung muốn theo dõi, tải xuống và toàn quyền kiểm soát.</p>
                                 </div>
                             </div>
                         </div>
@@ -434,23 +434,23 @@ export default function Index() {
                 <section id="contact" className="bg-slate-900 py-16 text-white md:py-24">
                     <div className="mx-auto max-w-4xl px-6 text-center">
                         <div className="rounded-[2rem] border border-white/10 bg-white/5 p-8 md:p-12">
-                            <h2 className="text-3xl font-extrabold md:text-4xl">Start managing your money today</h2>
+                            <h2 className="text-3xl font-extrabold md:text-4xl">Bắt đầu quản lý chi tiêu ngay hôm nay</h2>
                             <p className="mx-auto mt-4 max-w-2xl text-white/70">
-                                Simple manual tracking, calm UI, and the clarity you want every week.
+                                Theo dõi thủ công đơn giản, giao diện nhẹ mắt và sự rõ ràng bạn cần mỗi tuần.
                             </p>
                             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
                                 <Link
                                     href={register()}
                                     className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-3 text-sm font-bold text-slate-900 transition hover:-translate-y-0.5 hover:bg-slate-100"
                                 >
-                                    Sign Up Now
+                                    Đăng ký ngay
                                     <ArrowRight className="h-4 w-4" />
                                 </Link>
                                 <Link
                                     href={expense.dashboard().url}
                                     className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 px-7 py-3 text-sm font-semibold text-white/80 transition hover:border-white/60 hover:text-white"
                                 >
-                                    View Demo
+                                    Xem demo
                                     <PlayCircle className="h-4 w-4" />
                                 </Link>
                             </div>
@@ -458,22 +458,80 @@ export default function Index() {
                     </div>
                 </section>
 
-                <section className="border-t border-slate-200 bg-white py-8">
-                    <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 text-sm text-slate-500 md:flex-row">
-                        <div className="flex items-center gap-2 font-semibold text-slate-800">
-                            <ShieldCheck className="h-4 w-4 text-emerald-500" />
-                            Simple tracking. Full control.
+                <section className="border-t border-slate-200 bg-white py-12">
+                    <div className="mx-auto max-w-7xl px-6">
+                        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-5">
+                            <div className="lg:col-span-2">
+                                <p className="text-lg font-extrabold tracking-tight text-slate-900">FinanceFlow</p>
+                                <p className="mt-3 max-w-sm text-sm leading-relaxed text-slate-600">
+                                    Ứng dụng quản lý chi tiêu cá nhân theo hướng thủ công, đơn giản và rõ ràng để bạn duy trì thói quen tài chính tốt mỗi tuần.
+                                </p>
+
+                            </div>
+
+                            <div>
+                                <p className="text-xs font-semibold tracking-[0.16em] text-slate-400 uppercase">Sản phẩm</p>
+                                <div className="mt-4 space-y-2 text-sm text-slate-600">
+                                    <a href="#features" className="block transition hover:text-slate-900">
+                                        Tính năng
+                                    </a>
+                                    <a href="#how-it-works" className="block transition hover:text-slate-900">
+                                        Cách hoạt động
+                                    </a>
+                                    <a href="#templates" className="block transition hover:text-slate-900">
+                                        Mẫu có sẵn
+                                    </a>
+                                    <a href="#privacy" className="block transition hover:text-slate-900">
+                                        Quyền riêng tư
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div>
+                                <p className="text-xs font-semibold tracking-[0.16em] text-slate-400 uppercase">Tài nguyên</p>
+                                <div className="mt-4 space-y-2 text-sm text-slate-600">
+                                    <Link href={register()} className="block transition hover:text-slate-900">
+                                        Đăng ký
+                                    </Link>
+                                    <Link href={expense.dashboard().url} className="block transition hover:text-slate-900">
+                                        Xem demo
+                                    </Link>
+                                    <a href="#testimonials" className="block transition hover:text-slate-900">
+                                        Đánh giá người dùng
+                                    </a>
+                                    <a href="#contact" className="block transition hover:text-slate-900">
+                                        Liên hệ
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div>
+                                <p className="text-xs font-semibold tracking-[0.16em] text-slate-400 uppercase">Kết nối</p>
+                                <div className="mt-4 flex items-center gap-3 text-slate-500">
+                                    <a href="#" className="rounded-full border border-slate-200 p-2 transition hover:border-slate-300 hover:text-slate-900">
+                                        <Twitter className="h-4 w-4" />
+                                    </a>
+                                    <a href="#" className="rounded-full border border-slate-200 p-2 transition hover:border-slate-300 hover:text-slate-900">
+                                        <Linkedin className="h-4 w-4" />
+                                    </a>
+                                    <a href="#" className="rounded-full border border-slate-200 p-2 transition hover:border-slate-300 hover:text-slate-900">
+                                        <Github className="h-4 w-4" />
+                                    </a>
+                                </div>
+                                <p className="mt-4 text-sm text-slate-500">hello@financeflow.app</p>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-4">
-                            <a href="#" className="transition hover:text-slate-900">
-                                <Twitter className="h-4 w-4" />
-                            </a>
-                            <a href="#" className="transition hover:text-slate-900">
-                                <Linkedin className="h-4 w-4" />
-                            </a>
-                            <a href="#" className="transition hover:text-slate-900">
-                                <Github className="h-4 w-4" />
-                            </a>
+
+                        <div className="mt-10 border-t border-slate-200 pt-6 text-sm text-slate-500 md:flex md:items-center md:justify-between">
+                            <p>© {new Date().getFullYear()} FinanceFlow. Đã đăng ký bản quyền.</p>
+                            <div className="mt-3 flex items-center gap-4 md:mt-0">
+                                <a href="#" className="transition hover:text-slate-900">
+                                    Điều khoản
+                                </a>
+                                <a href="#" className="transition hover:text-slate-900">
+                                    Chính sách bảo mật
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </section>

@@ -1,4 +1,17 @@
+import { Link } from '@inertiajs/react';
+import {
+    Folder,
+    Users,
+    Settings,
+    AlertTriangle,
+    Shield,
+    Key,
+    Tags,
+    ReceiptText,
+} from 'lucide-react';
+import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
+import { Button } from '@/components/ui/button';
 import {
     Sidebar,
     SidebarContent,
@@ -8,19 +21,14 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import adminUsers from '@/routes/admin/users';
-import adminPages from '@/routes/admin/pages';
-import adminRoles from '@/routes/admin/roles';
-import adminPermissions from '@/routes/admin/permissions';
-import adminLanguages from '@/routes/admin/settings/languages';
-import adminAppearance from '@/routes/admin/settings/appearance/options';
-import adminMerchants from '@/routes/admin/merchants';
 import adminCategories from '@/routes/admin/categories';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { Folder, Users, Settings, AlertTriangle, Languages, Shield, Key, Tags } from 'lucide-react';
-import AppLogo from '@/components/app-logo';
-import { Button } from "@/components/ui/button"
+import adminMerchants from '@/routes/admin/merchants';
+import adminPermissions from '@/routes/admin/permissions';
+import adminRoles from '@/routes/admin/roles';
+import adminAppearance from '@/routes/admin/settings/appearance/options';
+import adminTransactions from '@/routes/admin/transactions';
+import adminUsers from '@/routes/admin/users';
+import type { NavItem } from '@/types';
 
 const adminNavItems: NavItem[] = [
     {
@@ -41,8 +49,8 @@ const adminNavItems: NavItem[] = [
                 title: 'Permissions',
                 href: adminPermissions.index().url,
                 icon: Key,
-            }
-        ]
+            },
+        ],
     },
     {
         title: 'Merchants',
@@ -53,6 +61,11 @@ const adminNavItems: NavItem[] = [
         title: 'Categories',
         href: adminCategories.index().url,
         icon: Tags,
+    },
+    {
+        title: 'Transactions',
+        href: adminTransactions.index().url,
+        icon: ReceiptText,
     },
     {
         title: 'Appearance',
@@ -67,7 +80,7 @@ const adminNavItems: NavItem[] = [
                 title: 'Slider',
                 href: '#',
                 icon: Settings,
-            }
+            },
         ],
     },
     // {
@@ -84,10 +97,7 @@ const adminNavItems: NavItem[] = [
     //         icon: Languages,
     //     }],
     // },
-
-
 ];
-
 
 export function AdminSidebar() {
     return (
@@ -110,8 +120,12 @@ export function AdminSidebar() {
 
             <SidebarFooter>
                 <Button variant="outline" size="sm" className="w-full">
-                    <a href="/user" target="_blank" className="flex items-center">
-                        <AlertTriangle className="size-4 mr-2" />
+                    <a
+                        href="/user"
+                        target="_blank"
+                        className="flex items-center"
+                    >
+                        <AlertTriangle className="mr-2 size-4" />
                         Go to User
                     </a>
                 </Button>
