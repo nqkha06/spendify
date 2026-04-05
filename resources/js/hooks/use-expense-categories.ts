@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import type { ExpenseCategory } from '@/types/expense-tracker';
+import type { TrackerCategory } from '@/types/expense-tracker';
 
-export function useExpenseCategories(): ExpenseCategory[] {
-    const [categories, setCategories] = useState<ExpenseCategory[]>([]);
+export function useTrackerCategories(): TrackerCategory[] {
+    const [categories, setCategories] = useState<TrackerCategory[]>([]);
 
     useEffect(() => {
         let isMounted = true;
@@ -21,7 +21,7 @@ export function useExpenseCategories(): ExpenseCategory[] {
                     return;
                 }
 
-                const data = (await response.json()) as ExpenseCategory[];
+                const data = (await response.json()) as TrackerCategory[];
 
                 if (isMounted && Array.isArray(data)) {
                     setCategories(data);

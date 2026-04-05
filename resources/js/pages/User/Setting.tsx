@@ -1,18 +1,18 @@
 import { User, Bell, Shield, Palette, Globe, ChevronRight } from 'lucide-react';
-import ExpenseLayout from '@/components/expense-tracker/layout';
+import TrackerLayout from '@/components/expense-tracker/layout';
 import type {
-    ExpenseNavigationItem,
-    ExpenseProfile,
+    TrackerNavigationItem,
+    TrackerProfile,
 } from '@/types/expense-tracker';
 
 interface SettingProps {
-    navigation: ExpenseNavigationItem[];
-    profile?: ExpenseProfile;
+    navigation: TrackerNavigationItem[];
+    profile?: TrackerProfile;
 }
 
 export default function Setting({ navigation, profile }: SettingProps) {
     return (
-        <ExpenseLayout
+        <TrackerLayout
             title="Cài đặt"
             heading="Cài đặt"
             description="Quản lý hồ sơ và tùy chọn ứng dụng của bạn."
@@ -135,6 +135,6 @@ export default function Setting({ navigation, profile }: SettingProps) {
                     </div>
                 </div>
             </div>
-        </ExpenseLayout>
+        </TrackerLayout>
     );
 }

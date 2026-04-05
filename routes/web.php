@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\Appearance\OptionController;
+use App\Http\Controllers\Admin\BudgetController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\MerchantController;
 use App\Http\Controllers\Admin\PageController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Admin\Settings\LanguageController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\User\BudgetStoreController;
 use App\Http\Controllers\User\CategoryListController;
 use App\Http\Controllers\User\ExpenseBudgetsController;
 use App\Http\Controllers\User\ExpenseDashboardController;
@@ -33,6 +35,7 @@ Route::prefix('user')->name('expense.')->group(function () {
     Route::get('/transactions', ExpenseTransactionsController::class)->name('transactions');
     Route::post('/transactions', TransactionStoreController::class)->middleware('auth')->name('transactions.store');
     Route::get('/budgets', ExpenseBudgetsController::class)->name('budgets');
+    Route::post('/budgets', BudgetStoreController::class)->middleware('auth')->name('budgets.store');
     Route::get('/wallets', ExpenseWalletsController::class)->middleware('auth')->name('wallets');
     Route::post('/wallets', WalletStoreController::class)->middleware('auth')->name('wallets.store');
     Route::get('/settings', ExpenseSettingsController::class)->name('settings');
@@ -44,6 +47,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::resource('users', UserController::class);
     Route::resource('merchants', MerchantController::class);
     Route::resource('categories', CategoryController::class);
+    Route::resource('budgets', BudgetController::class);
     Route::resource('transactions', TransactionController::class);
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);

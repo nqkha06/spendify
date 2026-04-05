@@ -32,14 +32,14 @@ import {
     Pie,
     Cell,
 } from 'recharts';
-import ExpenseLayout from '@/components/expense-tracker/layout';
+import TrackerLayout from '@/components/expense-tracker/layout';
 import expense from '@/routes/expense';
 import type {
-    ExpenseCategory,
-    ExpenseTransaction,
-    ExpenseNavigationItem,
-    ExpenseProfile,
-    ExpenseWallet,
+    TrackerCategory,
+    TrackerTransaction,
+    TrackerNavigationItem,
+    TrackerProfile,
+    TrackerWallet,
 } from '@/types/expense-tracker';
 
 type DashboardPeriod = 'this-month' | 'last-month' | 'this-year';
@@ -64,12 +64,12 @@ const calculateChange = (currentValue: number, previousValue: number): number | 
 const isValidDate = (date: Date): boolean => !Number.isNaN(date.getTime());
 
 interface DashboardProps {
-    navigation: ExpenseNavigationItem[];
-    profile?: ExpenseProfile;
+    navigation: TrackerNavigationItem[];
+    profile?: TrackerProfile;
     data?: {
-        categories?: ExpenseCategory[];
-        wallets?: ExpenseWallet[];
-        transactions?: ExpenseTransaction[];
+        categories?: TrackerCategory[];
+        wallets?: TrackerWallet[];
+        transactions?: TrackerTransaction[];
     };
 }
 
@@ -361,7 +361,7 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
     };
 
     return (
-        <ExpenseLayout
+        <TrackerLayout
             title="Tổng quan"
             heading="Tổng quan tài chính"
             description="Theo dõi số dư, dòng tiền và chi tiêu trong nháy mắt."
@@ -731,6 +731,6 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
                     </div>
                 </div>
             </div>
-        </ExpenseLayout>
+        </TrackerLayout>
     );
 }

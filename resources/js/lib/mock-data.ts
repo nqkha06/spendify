@@ -1,11 +1,11 @@
 import type {
-    ExpenseBudget,
-    ExpenseCategory,
-    ExpenseTransaction,
-    ExpenseWallet,
+    TrackerBudget,
+    TrackerCategory,
+    TrackerTransaction,
+    TrackerWallet,
 } from '@/types/expense-tracker';
 
-export const MOCK_CATEGORIES: ExpenseCategory[] = [
+export const MOCK_CATEGORIES: TrackerCategory[] = [
     { id: 'cat-food', name: 'Ăn uống', color: '#f97316' },
     { id: 'cat-transport', name: 'Di chuyển', color: '#0ea5e9' },
     { id: 'cat-shopping', name: 'Mua sắm', color: '#a855f7' },
@@ -14,7 +14,7 @@ export const MOCK_CATEGORIES: ExpenseCategory[] = [
     { id: 'cat-freelance', name: 'Làm tự do', color: '#22c55e' },
 ];
 
-export const MOCK_WALLETS: ExpenseWallet[] = [
+export const MOCK_WALLETS: TrackerWallet[] = [
     {
         id: 'wallet-cash',
         name: 'Ví tiền mặt',
@@ -39,7 +39,7 @@ export const MOCK_WALLETS: ExpenseWallet[] = [
     },
 ];
 
-export const MOCK_TRANSACTIONS: ExpenseTransaction[] = [
+export const MOCK_TRANSACTIONS: TrackerTransaction[] = [
     {
         id: 'tx-1001',
         amount: 3200,
@@ -98,7 +98,7 @@ export const MOCK_TRANSACTIONS: ExpenseTransaction[] = [
     },
 ];
 
-export const MOCK_BUDGETS: ExpenseBudget[] = [
+export const MOCK_BUDGETS: TrackerBudget[] = [
     {
         id: 'budget-food',
         categoryId: 'cat-food',

@@ -1,25 +1,25 @@
 import { Link } from '@inertiajs/react';
 import type {
-    ExpenseNavigationItem,
-    ExpenseProfile,
+    TrackerNavigationItem,
+    TrackerProfile,
 } from '@/types/expense-tracker';
 
-interface ExpenseHeaderProps {
-    navigation: ExpenseNavigationItem[];
+interface TrackerHeaderProps {
+    navigation: TrackerNavigationItem[];
     activePath: string;
-    profile?: ExpenseProfile;
+    profile?: TrackerProfile;
 }
 
-export default function ExpenseHeader({
+export default function TrackerHeader({
     navigation,
     activePath,
     profile,
-}: ExpenseHeaderProps) {
+}: TrackerHeaderProps) {
     const homeLink = navigation[0]?.href ?? '/user';
 
     return (
         <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
-            <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6">
+            <div className="mx-auto flex h-18 w-full max-w-7xl items-center justify-between px-4 sm:px-6">
                 <Link href={homeLink} className="flex items-center gap-2">
                     <div className="w-9 h-9">
                         <img className='w-full h-full object-cover rounded-xl shadow-sm' src="/logo.png" alt="Spendify Logo" />

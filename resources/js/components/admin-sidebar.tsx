@@ -7,6 +7,7 @@ import {
     Shield,
     Key,
     Tags,
+    PiggyBank,
     ReceiptText,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
@@ -22,6 +23,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import adminCategories from '@/routes/admin/categories';
+import adminBudgets from '@/routes/admin/budgets';
 import adminMerchants from '@/routes/admin/merchants';
 import adminPermissions from '@/routes/admin/permissions';
 import adminRoles from '@/routes/admin/roles';
@@ -61,6 +63,11 @@ const adminNavItems: NavItem[] = [
         title: 'Categories',
         href: adminCategories.index().url,
         icon: Tags,
+    },
+    {
+        title: 'Budgets',
+        href: adminBudgets.index().url,
+        icon: PiggyBank,
     },
     {
         title: 'Transactions',

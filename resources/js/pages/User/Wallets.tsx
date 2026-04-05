@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import ExpenseLayout from '@/components/expense-tracker/layout';
+import TrackerLayout from '@/components/expense-tracker/layout';
 import {
     MOCK_WALLETS,
     MOCK_TRANSACTIONS,
@@ -19,20 +19,20 @@ import {
 } from '@/lib/mock-data';
 import expense from '@/routes/expense';
 import type {
-    ExpenseCategory,
-    ExpenseNavigationItem,
-    ExpenseProfile,
-    ExpenseTransaction,
-    ExpenseWallet,
+    TrackerCategory,
+    TrackerNavigationItem,
+    TrackerProfile,
+    TrackerTransaction,
+    TrackerWallet,
 } from '@/types/expense-tracker';
 
 interface WalletsProps {
-    navigation: ExpenseNavigationItem[];
-    profile?: ExpenseProfile;
+    navigation: TrackerNavigationItem[];
+    profile?: TrackerProfile;
     data?: {
-        wallets?: ExpenseWallet[];
-        categories?: ExpenseCategory[];
-        transactions?: ExpenseTransaction[];
+        wallets?: TrackerWallet[];
+        categories?: TrackerCategory[];
+        transactions?: TrackerTransaction[];
     };
 }
 
@@ -108,7 +108,7 @@ export default function Wallets({ navigation, profile, data }: WalletsProps) {
         );
 
     return (
-        <ExpenseLayout
+        <TrackerLayout
             title="Ví tiền"
             heading="Ví tiền"
             description="Quản lý số dư tiền mặt, ngân hàng và thẻ tại một nơi."
@@ -428,6 +428,6 @@ export default function Wallets({ navigation, profile, data }: WalletsProps) {
                     )}
                 </div>
             </div>
-        </ExpenseLayout>
+        </TrackerLayout>
     );
 }

@@ -10,21 +10,21 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import type { ComponentType, PropsWithChildren } from 'react';
-import ExpenseFooter from '@/components/expense-tracker/footer';
-import ExpenseHeader from '@/components/expense-tracker/header';
+import TrackerFooter from '@/components/expense-tracker/footer';
+import TrackerHeader from '@/components/expense-tracker/header';
 import type {
-    ExpenseNavigationItem,
-    ExpenseProfile,
+    TrackerNavigationItem,
+    TrackerProfile,
 } from '@/types/expense-tracker';
 
-interface ExpenseLayoutProps extends PropsWithChildren {
+interface TrackerLayoutProps extends PropsWithChildren {
     title: string;
     heading: string;
     description?: string;
     action?: React.ReactNode;
     activePath: string;
-    navigation: ExpenseNavigationItem[];
-    profile?: ExpenseProfile;
+    navigation: TrackerNavigationItem[];
+    profile?: TrackerProfile;
     showSidebar?: boolean;
 }
 
@@ -43,7 +43,7 @@ const navigationIconMap: Record<string, NavigationIcon> = {
     'cài đặt': Settings2,
 };
 
-function resolveNavigationIcon(item: ExpenseNavigationItem): NavigationIcon {
+function resolveNavigationIcon(item: TrackerNavigationItem): NavigationIcon {
     const normalizedLabel = item.label.trim().toLowerCase();
 
     if (navigationIconMap[normalizedLabel]) {
@@ -73,15 +73,15 @@ function resolveNavigationIcon(item: ExpenseNavigationItem): NavigationIcon {
     return Circle;
 }
 
-interface MobileExpenseNavigationProps {
+interface MobileTrackerNavigationProps {
     activePath: string;
-    navigation: ExpenseNavigationItem[];
+    navigation: TrackerNavigationItem[];
 }
 
-function MobileExpenseNavigation({
+function MobileTrackerNavigation({
     activePath,
     navigation,
-}: MobileExpenseNavigationProps) {
+}: MobileTrackerNavigationProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const quickNavigation = navigation.slice(0, 3);
     const overflowNavigation = navigation.slice(3);
@@ -230,7 +230,7 @@ function MobileExpenseNavigation({
     );
 }
 
-export default function ExpenseLayout({
+export default function TrackerLayout({
     title,
     heading,
     description,
@@ -239,11 +239,11 @@ export default function ExpenseLayout({
     navigation,
     profile,
     children,
-}: ExpenseLayoutProps) {
+}: TrackerLayoutProps) {
     return (
         <div className="min-h-screen bg-slate-50 text-slate-900">
             <Head title={title} />
-            <ExpenseHeader
+            <TrackerHeader
                 navigation={navigation}
                 activePath={activePath}
                 profile={profile}
@@ -267,9 +267,9 @@ export default function ExpenseLayout({
                 </div>
             </main>
 
-            <ExpenseFooter />
+            <TrackerFooter />
 
-            <MobileExpenseNavigation
+            <MobileTrackerNavigation
                 navigation={navigation}
                 activePath={activePath}
             />

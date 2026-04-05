@@ -1,21 +1,21 @@
-export interface ExpenseNavigationItem {
+export interface TrackerNavigationItem {
     label: string;
     href: string;
 }
 
-export interface ExpenseProfile {
+export interface TrackerProfile {
     name: string;
     email: string;
     initials: string;
 }
 
-export interface ExpenseCategory {
+export interface TrackerCategory {
     id: string;
     name: string;
     color: string;
 }
 
-export interface ExpenseWallet {
+export interface TrackerWallet {
     id: string;
     name: string;
     balance: number;
@@ -24,7 +24,7 @@ export interface ExpenseWallet {
     isDefault?: boolean;
 }
 
-export interface ExpenseTransaction {
+export interface TrackerTransaction {
     id: string;
     amount: number;
     type: 'income' | 'expense';
@@ -36,7 +36,7 @@ export interface ExpenseTransaction {
     status?: 'posted' | 'pending' | 'cancelled';
 }
 
-export interface ExpenseBudget {
+export interface TrackerBudget {
     id: string;
     categoryId: string;
     limit: number;
@@ -44,9 +44,9 @@ export interface ExpenseBudget {
     period: 'monthly' | 'yearly';
 }
 
-export interface ExpenseDataBundle {
-    categories: ExpenseCategory[];
-    wallets: ExpenseWallet[];
-    transactions: ExpenseTransaction[];
-    budgets: ExpenseBudget[];
+export interface TrackerDataBundle {
+    categories: TrackerCategory[];
+    wallets: TrackerWallet[];
+    transactions: TrackerTransaction[];
+    budgets: TrackerBudget[];
 }

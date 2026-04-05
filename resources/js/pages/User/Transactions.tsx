@@ -10,27 +10,27 @@ import {
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
-import ExpenseLayout from '@/components/expense-tracker/layout';
+import TrackerLayout from '@/components/expense-tracker/layout';
 import {
     MOCK_CATEGORIES,
     MOCK_WALLETS,
 } from '@/lib/mock-data';
 import expense from '@/routes/expense';
 import type {
-    ExpenseCategory,
-    ExpenseNavigationItem,
-    ExpenseProfile,
-    ExpenseTransaction,
-    ExpenseWallet,
+    TrackerCategory,
+    TrackerNavigationItem,
+    TrackerProfile,
+    TrackerTransaction,
+    TrackerWallet,
 } from '@/types/expense-tracker';
 
 interface TransactionsProps {
-    navigation: ExpenseNavigationItem[];
-    profile?: ExpenseProfile;
+    navigation: TrackerNavigationItem[];
+    profile?: TrackerProfile;
     data?: {
-        transactions?: ExpenseTransaction[];
-        categories?: ExpenseCategory[];
-        wallets?: ExpenseWallet[];
+        transactions?: TrackerTransaction[];
+        categories?: TrackerCategory[];
+        wallets?: TrackerWallet[];
     };
 }
 
@@ -120,7 +120,7 @@ export default function Transactions({
     };
 
     return (
-        <ExpenseLayout
+        <TrackerLayout
             title="Giao dịch"
             heading="Giao dịch"
             description="Ghi lại mọi khoản thu chi tại một nơi."
@@ -552,6 +552,6 @@ export default function Transactions({
                     </div>
                 ) : null}
             </div>
-        </ExpenseLayout>
+        </TrackerLayout>
     );
 }
