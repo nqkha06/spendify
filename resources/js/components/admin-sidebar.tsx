@@ -24,7 +24,6 @@ import {
 } from '@/components/ui/sidebar';
 import adminCategories from '@/routes/admin/categories';
 import adminBudgets from '@/routes/admin/budgets';
-import adminMerchants from '@/routes/admin/merchants';
 import adminPermissions from '@/routes/admin/permissions';
 import adminRoles from '@/routes/admin/roles';
 import adminAppearance from '@/routes/admin/settings/appearance/options';
@@ -54,11 +53,7 @@ const adminNavItems: NavItem[] = [
             },
         ],
     },
-    {
-        title: 'Merchants',
-        href: adminMerchants.index().url,
-        icon: Folder,
-    },
+
     {
         title: 'Categories',
         href: adminCategories.index().url,

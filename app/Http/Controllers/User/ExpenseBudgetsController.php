@@ -100,7 +100,7 @@ class ExpenseBudgetsController extends Controller
                 ['label' => 'Giao dịch', 'href' => route('expense.transactions')],
                 ['label' => 'Ngân sách', 'href' => route('expense.budgets')],
                 ['label' => 'Ví tiền', 'href' => route('expense.wallets')],
-                ['label' => 'Cài đặt', 'href' => route('expense.settings')],
+
             ],
             'profile' => [
                 'name' => $user?->name ?? 'Khách',

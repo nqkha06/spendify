@@ -1,4 +1,14 @@
 import { Link } from '@inertiajs/react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { logout } from '@/routes';
+import expense from '@/routes/expense';
 import type {
     TrackerNavigationItem,
     TrackerProfile,
@@ -8,6 +18,36 @@ interface TrackerHeaderProps {
     navigation: TrackerNavigationItem[];
     activePath: string;
     profile?: TrackerProfile;
+}
+
+function normalizePath(pathOrUrl: string): string {
+    const fallbackPath = pathOrUrl.split('?')[0]?.split('#')[0] ?? '/';
+
+    try {
+        const parsedUrl = new URL(pathOrUrl, window.location.origin);
+        const normalizedPath = parsedUrl.pathname.replace(/\/$/, '');
+
+        return normalizedPath === '' ? '/' : normalizedPath;
+    } catch {
+        const normalizedPath = fallbackPath.replace(/\/$/, '');
+
+        return normalizedPath === '' ? '/' : normalizedPath;
+    }
+}
+
+function isPathActive(activePath: string, itemHref: string): boolean {
+    const normalizedActivePath = normalizePath(activePath);
+    const normalizedItemPath = normalizePath(itemHref);
+
+    if (normalizedActivePath === normalizedItemPath) {
+        return true;
+    }
+
+    if (normalizedItemPath === '/') {
+        return normalizedActivePath === '/';
+    }
+
+    return normalizedActivePath.startsWith(`${normalizedItemPath}/`);
 }
 
 export default function TrackerHeader({
@@ -29,19 +69,20 @@ export default function TrackerHeader({
                     </span>
                 </Link>
 
-                <nav className="hidden items-center gap-1 md:flex">
+               <nav className="hidden self-stretch items-stretch gap-1 md:flex">
                     {navigation.map((item) => {
-                        const isActive = activePath === item.href;
+                        const isActive = isPathActive(activePath, item.href);
 
                         return (
                             <Link
                                 key={item.href}
                                 href={item.href}
                                 className={[
-                                    'rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                                    'relative inline-flex h-full items-center px-3 text-sm font-medium transition-colors',
+                                    'after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:rounded-full after:transition-all',
                                     isActive
-                                        ? 'bg-blue-50 text-blue-700'
-                                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+                                        ? 'text-blue-700 after:bg-blue-600'
+                                        : 'text-slate-600 hover:text-slate-900 after:bg-transparent hover:after:bg-slate-300',
                                 ].join(' ')}
                             >
                                 {item.label}
@@ -50,19 +91,60 @@ export default function TrackerHeader({
                     })}
                 </nav>
 
-                <div className="flex items-center gap-3">
-                    <div className="block text-right sm:block">
-                        <p className="text-sm font-semibold text-slate-900">
-                            {profile?.name ?? 'Khách'}
-                        </p>
-                        <p className="text-xs text-slate-500">
-                            {profile?.email ?? 'khach@example.com'}
-                        </p>
-                    </div>
-                    <div className="flex size-9 items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-700">
-                        {profile?.initials ?? 'KH'}
-                    </div>
-                </div>
+                {profile ? (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button
+                                type="button"
+                                className="flex items-center gap-3 rounded-xl px-2 py-1.5 transition-colors hover:bg-slate-100"
+                            >
+                                <div className="hidden text-right sm:block">
+                                    <p className="text-sm font-semibold text-slate-900">
+                                        {profile.name}
+                                    </p>
+                                    <p className="text-xs text-slate-500">
+                                        {profile.email}
+                                    </p>
+                                </div>
+                                <div className="flex size-9 items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-700">
+                                    {profile.initials}
+                                </div>
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-56">
+                            <DropdownMenuLabel>
+                                <div className="flex flex-col">
+                                    <span className="text-sm font-semibold text-slate-900">
+                                        {profile.name}
+                                    </span>
+                                    <span className="text-xs text-slate-500">
+                                        {profile.email}
+                                    </span>
+                                </div>
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                                <Link
+                                    href={expense.settings().url}
+                                    className="cursor-pointer"
+                                >
+                                    Cài đặt
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                                <Link
+                                    href={logout()}
+                                    method="post"
+                                    as="button"
+                                    className="w-full cursor-pointer"
+                                >
+                                    Đăng xuất
+                                </Link>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                ) : null}
             </div>
         </header>
     );

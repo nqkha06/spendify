@@ -30,6 +30,36 @@ interface TrackerLayoutProps extends PropsWithChildren {
 
 type NavigationIcon = ComponentType<{ className?: string }>;
 
+function normalizePath(pathOrUrl: string): string {
+    const fallbackPath = pathOrUrl.split('?')[0]?.split('#')[0] ?? '/';
+
+    try {
+        const parsedUrl = new URL(pathOrUrl, window.location.origin);
+        const normalizedPath = parsedUrl.pathname.replace(/\/$/, '');
+
+        return normalizedPath === '' ? '/' : normalizedPath;
+    } catch {
+        const normalizedPath = fallbackPath.replace(/\/$/, '');
+
+        return normalizedPath === '' ? '/' : normalizedPath;
+    }
+}
+
+function isPathActive(activePath: string, itemHref: string): boolean {
+    const normalizedActivePath = normalizePath(activePath);
+    const normalizedItemPath = normalizePath(itemHref);
+
+    if (normalizedActivePath === normalizedItemPath) {
+        return true;
+    }
+
+    if (normalizedItemPath === '/') {
+        return normalizedActivePath === '/';
+    }
+
+    return normalizedActivePath.startsWith(`${normalizedItemPath}/`);
+}
+
 const navigationIconMap: Record<string, NavigationIcon> = {
     dashboard: Gauge,
     transactions: ArrowLeftRight,
@@ -86,7 +116,7 @@ function MobileTrackerNavigation({
     const quickNavigation = navigation.slice(0, 3);
     const overflowNavigation = navigation.slice(3);
     const isOverflowActive = overflowNavigation.some(
-        (item) => item.href === activePath,
+        (item) => isPathActive(activePath, item.href),
     );
 
     return (
@@ -106,7 +136,10 @@ function MobileTrackerNavigation({
                         </p>
                         <ul className="space-y-1">
                             {navigation.map((item) => {
-                                const isActive = activePath === item.href;
+                                const isActive = isPathActive(
+                                    activePath,
+                                    item.href,
+                                );
                                 const Icon = resolveNavigationIcon(item);
 
                                 return (
@@ -157,7 +190,10 @@ function MobileTrackerNavigation({
                     >
                         <ul className="grid grid-cols-4 gap-1">
                             {quickNavigation.map((item) => {
-                                const isActive = activePath === item.href;
+                                const isActive = isPathActive(
+                                    activePath,
+                                    item.href,
+                                );
                                 const Icon = resolveNavigationIcon(item);
 
                                 return (
@@ -171,16 +207,26 @@ function MobileTrackerNavigation({
                                                 setIsMenuOpen(false);
                                             }}
                                             className={[
-                                                'flex min-h-14 flex-col items-center justify-center rounded-2xl px-2 py-2 text-center text-[11px] font-semibold transition-all',
+                                                'relative flex min-h-14 flex-col items-center justify-center rounded-2xl px-2 py-2 text-center text-[11px] font-semibold transition-all',
                                                 isActive
-                                                    ? 'bg-blue-600 text-white shadow-sm shadow-blue-400/40'
-                                                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900',
+                                                    ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-200'
+                                                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 active:scale-[0.98] active:bg-slate-200 active:text-slate-900',
                                             ].join(' ')}
                                         >
-                                            <Icon className="size-5" />
+                                            <Icon
+                                                className={[
+                                                    'size-5 transition-transform duration-300',
+                                                    isActive
+                                                        ? 'scale-105'
+                                                        : '',
+                                                ].join(' ')}
+                                            />
                                             <span className="mt-1 truncate">
                                                 {item.label}
                                             </span>
+                                            {isActive ? (
+                                                <span className="mt-1 h-1 w-6 rounded-full bg-blue-600/80" />
+                                            ) : null}
                                         </Link>
                                     </li>
                                 );
@@ -204,7 +250,7 @@ function MobileTrackerNavigation({
                                         'flex min-h-14 w-full flex-col items-center justify-center rounded-2xl px-2 py-2 text-center text-[11px] font-semibold transition-all',
                                         isMenuOpen || isOverflowActive
                                             ? 'bg-blue-50 text-blue-700'
-                                            : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900',
+                                            : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 active:scale-[0.98] active:bg-slate-200 active:text-slate-900',
                                     ].join(' ')}
                                 >
                                     <span
