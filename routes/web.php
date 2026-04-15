@@ -3,7 +3,6 @@
 use App\Http\Controllers\Admin\Appearance\OptionController;
 use App\Http\Controllers\Admin\BudgetController;
 use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\MerchantController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\PostController;
@@ -45,7 +44,6 @@ Route::prefix('user')->name('expense.')->group(function () {
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('pages', PageController::class);
     Route::resource('users', UserController::class);
-    Route::resource('merchants', MerchantController::class);
     Route::resource('categories', CategoryController::class);
     Route::resource('budgets', BudgetController::class);
     Route::resource('transactions', TransactionController::class);

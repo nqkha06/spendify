@@ -2,46 +2,45 @@
 
 namespace App\Models;
 
+use App\Enums\BaseStatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\HasTranslations;
-use App\Enums\BaseStatusEnum;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Page extends Model
 {
-    use HasFactory, HasTranslations;
+    use HasFactory;
 
     protected $fillable = [
         'user_id',
-        'image',
-        'slug',
-        'category_id',
-        'tags',
-        'status'
-    ];
-    protected $translatable = [
         'title',
+        'image',
         'content',
-        'slug',
         'meta_title',
         'meta_description',
         'meta_keywords',
+        'slug',
+        'category_id',
+        'tags',
+        'status',
     ];
+
     protected $attributes = [
         'status' => BaseStatusEnum::DRAFT,
     ];
+
     protected $casts = [
         'status' => BaseStatusEnum::class,
         'tags' => 'array',
     ];
 
-    public function category()
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
-    public function views()
+    public function user(): BelongsTo
     {
-        return $this->hasMany(PageView::class, 'page_id');
+        return $this->belongsTo(User::class);
     }
 }

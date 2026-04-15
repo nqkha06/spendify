@@ -95,22 +95,6 @@ class ExpenseBudgetsController extends Controller
             ->all();
 
         return Inertia::render('User/Budgets', [
-            'navigation' => [
-                ['label' => 'Tổng quan', 'href' => route('expense.dashboard')],
-                ['label' => 'Giao dịch', 'href' => route('expense.transactions')],
-                ['label' => 'Ngân sách', 'href' => route('expense.budgets')],
-                ['label' => 'Ví tiền', 'href' => route('expense.wallets')],
-
-            ],
-            'profile' => [
-                'name' => $user?->name ?? 'Khách',
-                'email' => $user?->email ?? 'khach@example.com',
-                'initials' => collect(explode(' ', (string) ($user?->name ?? 'Khách')))
-                    ->filter()
-                    ->take(2)
-                    ->map(fn (string $part): string => strtoupper(substr($part, 0, 1)))
-                    ->implode(''),
-            ],
             'data' => [
                 'categories' => $categories,
                 'budgets' => $mappedBudgets,

@@ -2,61 +2,53 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Enums\BaseStatusEnum;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\PageRequest;
-use App\Models\Language;
 use App\Models\Page;
-use App\Support\Crud\IndexQuery;
-use App\Support\Crud\PersistAction;
+use App\Services\PageService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 
 class PageController extends Controller
 {
+    protected $service;
+
+    public function __construct(PageService $service)
+    {
+        $this->service = $service;
+    }
+
     public function index(Request $request): InertiaResponse
     {
-        $defaultLocale = $this->defaultLocale();
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortDirection = $request->get('sort_direction', 'desc');
+        $perPage = (int) $request->get('per_page', 10);
+        $status = $request->get('status');
 
-        $pages = IndexQuery::for(Page::class)
-            ->with(['translations'])
-            ->filters([
-                'search' => function (Builder $q, $value) {
-                    $term = trim((string) $value);
-                    $q->where(function (Builder $builder) use ($term) {
-                        $builder
-                            ->where('slug', 'like', "%{$term}%")
-                            ->orWhereHas('translations', function (Builder $t) use ($term) {
-                                $t->where('title', 'like', "%{$term}%")
-                                    ->orWhere('slug', 'like', "%{$term}%");
-                            });
-                    });
-                },
-                'status' => ['type' => 'eq', 'col' => 'status'],
-            ])
-            ->sorts(['slug', 'status', 'created_at', 'id'], 'created_at', 'desc')
-            ->paginate($request);
+        $pages = $this->service->paginate([
+            'search' => $request->get('search'),
+            'status' => $status,
+            'sort_by' => $sortBy,
+            'sort_direction' => $sortDirection,
+            'per_page' => $perPage,
+        ]);
 
-        $items = collect($pages->items())->map(function (Page $page) use ($defaultLocale) {
-            $translation = $page->translations
-                ->firstWhere('lang_code', $defaultLocale)
-                ?? $page->translations->first();
-
+        $items = collect($pages->items())->map(function (Page $page) {
             return [
                 'id' => $page->id,
-                'title' => $translation?->title ?? '',
-                'slug' => $translation?->slug ?? $page->slug,
+                'title' => $page->title,
+                'slug' => $page->slug,
                 'status' => $page->status instanceof BaseStatusEnum ? $page->status->value : (string) $page->status,
                 'created_at' => optional($page->created_at)->toDateTimeString(),
             ];
         });
 
-        return Inertia::render('admin/pages/list', [
+        return Inertia::render('Admin/pages/list', [
             'pages' => $items,
             'pagination' => [
                 'current_page' => $pages->currentPage(),
@@ -67,41 +59,40 @@ class PageController extends Controller
                 'to' => $pages->lastItem(),
             ],
             'filters' => [
-                'search' => $request->input('search'),
-                'status' => $request->input('status'),
-                'sort' => $request->input('sort'),
-                'dir' => $request->input('dir'),
-                'sort_by' => $request->input('sort'),
-                'sort_direction' => $request->input('dir'),
+                'search' => $request->search,
+                'status' => $status,
+                'sort_by' => $sortBy,
+                'sort_direction' => $sortDirection,
+                'per_page' => $perPage,
             ],
         ]);
     }
 
     public function create(): InertiaResponse
     {
-        return Inertia::render('admin/pages/add', [
-            'languages' => $this->languages(),
-            'default_locale' => $this->defaultLocale(),
-        ]);
+        return Inertia::render('Admin/pages/add');
     }
 
-    public function store(PageRequest $request, PersistAction $persist)
+    public function store(PageRequest $request)
     {
         $data = $request->validated();
 
-        $page = $persist->create(Page::class, [
+        $page = Page::query()->create([
             'user_id' => $request->user()?->id,
+            'title' => $data['title'],
             'image' => $data['image'] ?? null,
+            'content' => $data['content'] ?? null,
+            'meta_title' => $data['meta_title'] ?? null,
+            'meta_description' => $data['meta_description'] ?? null,
+            'meta_keywords' => $data['meta_keywords'] ?? null,
             'slug' => $this->resolveBaseSlug($data),
             'category_id' => $data['category_id'] ?? null,
             'tags' => $this->normalizeTags($data['tags'] ?? null),
             'status' => $data['status'] ?? BaseStatusEnum::DRAFT->value,
         ]);
 
-        $this->syncTranslations($page, $data['translations'] ?? []);
-
         if ($request->wantsJson()) {
-            return response()->json($page->load('translations'), Response::HTTP_CREATED);
+            return response()->json($page, Response::HTTP_CREATED);
         }
 
         return redirect()->route('admin.pages.index')->with('success', 'Page created successfully.');
@@ -109,50 +100,42 @@ class PageController extends Controller
 
     public function edit(Page $page): InertiaResponse
     {
-        $page->load('translations');
-
-        $translations = $page->translations->mapWithKeys(fn ($t) => [
-            $t->lang_code => [
-                'title' => $t->title,
-                'slug' => $t->slug,
-                'content' => $t->content,
-                'meta_title' => $t->meta_title,
-                'meta_description' => $t->meta_description,
-                'meta_keywords' => $t->meta_keywords,
-            ],
-        ]);
-
-        return Inertia::render('admin/pages/edit', [
-            'languages' => $this->languages(),
-            'default_locale' => $this->defaultLocale(),
+        return Inertia::render('Admin/pages/edit', [
             'page' => [
                 'id' => $page->id,
+                'title' => $page->title,
                 'slug' => $page->slug,
                 'image' => $page->image,
+                'content' => $page->content,
+                'meta_title' => $page->meta_title,
+                'meta_description' => $page->meta_description,
+                'meta_keywords' => $page->meta_keywords,
                 'category_id' => $page->category_id,
                 'tags' => $page->tags,
                 'status' => $page->status instanceof BaseStatusEnum ? $page->status->value : (string) $page->status,
-                'translations' => $translations,
             ],
         ]);
     }
 
-    public function update(PageRequest $request, Page $page, PersistAction $persist)
+    public function update(PageRequest $request, Page $page)
     {
         $data = $request->validated();
 
-        $persist->update($page, [
+        $page->update([
+            'title' => $data['title'],
             'slug' => $this->resolveBaseSlug($data, $page),
             'image' => $data['image'] ?? null,
+            'content' => $data['content'] ?? null,
+            'meta_title' => $data['meta_title'] ?? null,
+            'meta_description' => $data['meta_description'] ?? null,
+            'meta_keywords' => $data['meta_keywords'] ?? null,
             'category_id' => $data['category_id'] ?? null,
             'tags' => $this->normalizeTags($data['tags'] ?? null),
             'status' => $data['status'] ?? $page->status,
-        ], false);
-
-        $this->syncTranslations($page, $data['translations'] ?? []);
+        ]);
 
         if ($request->wantsJson()) {
-            return response()->json($page->load('translations'));
+            return response()->json($page);
         }
 
         return redirect()->route('admin.pages.index')->with('success', 'Page updated successfully.');
@@ -169,44 +152,9 @@ class PageController extends Controller
         return redirect()->route('admin.pages.index')->with('success', 'Page deleted successfully.');
     }
 
-    private function defaultLocale(): string
-    {
-        return Language::where('is_default', true)->value('code') ?? app()->getLocale();
-    }
-
-    private function languages(): Collection
-    {
-        return Language::orderBy('order')->get(['id', 'name', 'code', 'locale', 'is_default']);
-    }
-
-    private function syncTranslations(Page $page, array $translations): void
-    {
-        foreach ($translations as $locale => $payload) {
-            $rawSlug = $payload['slug'] ?? Str::slug((string) ($payload['title'] ?? ''));
-            $normalizedSlug = $rawSlug !== null && trim((string) $rawSlug) !== ''
-                ? Str::slug((string) $rawSlug)
-                : null;
-
-            $page->translations()->updateOrCreate(
-                ['lang_code' => $locale],
-                [
-                    'title' => $payload['title'] ?? '',
-                    'slug' => $normalizedSlug,
-                    'content' => $payload['content'] ?? null,
-                    'meta_title' => $payload['meta_title'] ?? null,
-                    'meta_description' => $payload['meta_description'] ?? null,
-                    'meta_keywords' => $payload['meta_keywords'] ?? null,
-                ]
-            );
-        }
-    }
-
     private function resolveBaseSlug(array $data, ?Page $page = null): string
     {
-        $defaultLocale = $this->defaultLocale();
-        $translation = $data['translations'][$defaultLocale] ?? reset($data['translations']) ?: [];
-
-        $slugSource = $data['slug'] ?? $translation['slug'] ?? $translation['title'] ?? '';
+        $slugSource = $data['slug'] ?? $data['title'] ?? '';
         $slug = Str::slug((string) $slugSource);
 
         if ($slug === '' && $page) {
@@ -214,10 +162,26 @@ class PageController extends Controller
         }
 
         if ($slug === '') {
-            return 'page-' . Str::random(8);
+            return 'page-'.Str::random(8);
         }
 
-        return $slug;
+        $candidate = $slug;
+        $counter = 1;
+
+        while ($this->slugExists($candidate, $page)) {
+            $candidate = "{$slug}-{$counter}";
+            $counter++;
+        }
+
+        return $candidate;
+    }
+
+    private function slugExists(string $slug, ?Page $page = null): bool
+    {
+        return Page::query()
+            ->where('slug', $slug)
+            ->when($page !== null, fn (Builder $query) => $query->whereKeyNot($page->getKey()))
+            ->exists();
     }
 
     private function normalizeTags($value): ?array

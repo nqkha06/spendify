@@ -10,6 +10,8 @@ trait HasSpecificationBuilder
 
     protected $includable = [];
 
+    protected $selectable = [];
+
     protected $searchable = [];
 
     protected $filterable = [];
@@ -21,6 +23,8 @@ trait HasSpecificationBuilder
     protected $maxPageSize = 100;
 
     protected $defaultSort = [];
+
+    protected $dateField = 'created_at';
 
     protected $dateFilterable = ['created_at', 'updated_at'];
 
@@ -36,20 +40,22 @@ trait HasSpecificationBuilder
     {
         $keyword = $this->parseSearchKeyword($request);
         $includes = $this->parseIncludes($request);
+        $selects = $this->parseSelectFields($request);
         $parsedFilters = $this->parseFilters($request);
         $dateFilters = $this->parseDateFilters($request);
         $sort = $this->parseSort($request);
 
         $status = $request->input('status', null);
         if ($status !== null && in_array('status', $this->filterable)) {
-            $parsedFilters['simple']['status'] = $status;
+            $parsedFilters['simple']['status'] = $this->normalizeFilterValue($status);
         }
 
-        $pageSize = (int) $request->input('per_page', $this->defaultPageSize);
+        $pageSize = (int) $request->input('limit', $request->input('per_page', $this->defaultPageSize));
         $pageSize = max(1, min($pageSize, $this->maxPageSize));
 
         return [
             'with' => $includes,
+            'select' => $selects,
             'search' => $keyword ? [
                 'value' => $keyword,
                 'fields' => $this->searchable,
@@ -93,14 +99,14 @@ trait HasSpecificationBuilder
                 }
 
                 if ($value !== null && $value !== '') {
-                    $filters['simple'][$field] = $value;
+                    $filters['simple'][$field] = $this->normalizeFilterValue($value);
                 }
             }
         }
 
         $allInputs = $request->all();
         foreach ($allInputs as $field => $value) {
-            if (in_array($field, ['filters', 'include', 'sort', 'search'], true)) {
+            if (in_array($field, ['filters', 'include', 'sort', 'search', 'fields', 'page', 'limit', 'per_page', 'keyword', 'sort_field', 'sort_order', 'sort_by', 'sort_direction'], true)) {
                 continue;
             }
 
@@ -113,8 +119,8 @@ trait HasSpecificationBuilder
                     }
                 }
             } else {
-                if (in_array($field, $this->filterable, true) && ! in_array($field, ['keyword', 'sort_field', 'sort_order', 'page', 'page_size'])) {
-                    $filters['simple'][$field] = $value;
+                if (in_array($field, $this->filterable, true) && ! in_array($field, ['keyword', 'sort_field', 'sort_order', 'page', 'page_size', 'sort_by', 'sort_direction'], true)) {
+                    $filters['simple'][$field] = $this->normalizeFilterValue($value);
                 }
             }
         }
@@ -188,17 +194,6 @@ trait HasSpecificationBuilder
             return $sorts;
         }
 
-        $sortField = $request->input('sort_field', $request->input('sort_by'));
-        if (is_string($sortField) && in_array($sortField, $this->sortable, true)) {
-            $directionInput = strtolower((string) $request->input('sort_order', $request->input('sort_direction', 'asc')));
-            $direction = $directionInput === 'desc' ? 'desc' : 'asc';
-
-            return [[
-                'field' => $sortField,
-                'direction' => $direction,
-            ]];
-        }
-
         if (empty($this->defaultSort)) {
             return [];
         }
@@ -231,7 +226,23 @@ trait HasSpecificationBuilder
     protected function parseDateFilters(Request $request): array
     {
         $dateFilters = [];
+
+        if (is_string($this->dateField) && $this->dateField !== '') {
+            $from = $request->input('created_from');
+            $to = $request->input('created_to');
+            if ($from || $to) {
+                $dateFilters[$this->dateField] = [
+                    'from' => $from,
+                    'to' => $to,
+                ];
+            }
+        }
+
         foreach ($this->dateFilterable as $field) {
+            if (! is_string($field) || $field === '' || array_key_exists($field, $dateFilters)) {
+                continue;
+            }
+
             $start = $request->input($field.'_from');
             $end = $request->input($field.'_to');
             if ($start || $end) {
@@ -251,5 +262,35 @@ trait HasSpecificationBuilder
     protected function isValidOperator(string $operator): bool
     {
         return in_array($operator, $this->allowedOperators, true) || is_numeric($operator);
+    }
+
+    protected function parseSelectFields(Request $request): array
+    {
+        $fields = $request->input('fields');
+        if (is_string($fields)) {
+            $requestedFields = array_filter(array_map('trim', explode(',', $fields)));
+
+            return array_values(array_filter($requestedFields, fn (string $field): bool => in_array($field, $this->selectable, true)));
+        }
+
+        if (! empty($this->selectable)) {
+            return $this->selectable;
+        }
+
+        return [];
+    }
+
+    protected function normalizeFilterValue(mixed $value): mixed
+    {
+        if (! is_string($value)) {
+            return $value;
+        }
+
+        $normalized = trim($value);
+        if ($normalized === '' || ! str_contains($normalized, ',')) {
+            return $normalized;
+        }
+
+        return array_values(array_filter(array_map('trim', explode(',', $normalized)), static fn (string $item): bool => $item !== ''));
     }
 }

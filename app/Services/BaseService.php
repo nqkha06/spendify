@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Attributes\ListQueryConfig;
 use App\Traits\HasSpecificationBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,7 +12,7 @@ abstract class BaseService
 {
     use HasSpecificationBuilder;
 
-    protected $request;
+    protected Request $request;
 
     protected $result;
 
@@ -21,19 +22,20 @@ abstract class BaseService
 
     protected $modelData = [];
 
-    protected $modelTranslationData = [];
+    protected ?string $queryAlias = null;
 
-    protected $modelTranslation;
+    protected ?ListQueryConfig $querySetup = null;
 
     public function __construct($repository)
     {
         $this->repository = $repository;
+        $this->bootstrapListQueryConfiguration();
     }
 
     // ====== MAIN DATA METHODS ======
     public function getAll(array|Request $request = [])
     {
-        $this->setRequest($this->normalizeRequest($request));
+        $this->setRequest($this->normalizeListRequest($request));
         $specification = $this->specificationBuilder();
 
         $this->result = $this->repository->get($specification);
@@ -43,7 +45,7 @@ abstract class BaseService
 
     public function getCount(array|Request $request = [])
     {
-        $this->setRequest($this->normalizeRequest($request));
+        $this->setRequest($this->normalizeListRequest($request));
         $specification = $this->specificationBuilder();
 
         $this->result = $this->repository->getCount($specification);
@@ -53,7 +55,7 @@ abstract class BaseService
 
     public function paginate(array|Request $request = [])
     {
-        $this->setRequest($this->normalizeRequest($request));
+        $this->setRequest($this->normalizeListRequest($request));
         $specification = $this->specificationBuilder();
 
         $this->result = $this->repository->pagination($specification);
@@ -79,7 +81,6 @@ abstract class BaseService
                 ->prepareModel()
                 ->beforeSave()
                 ->saveModel($id)
-                ->saveTranslation()
                 ->saveRelations()
                 ->afterSave()
                 ->commit()
@@ -112,20 +113,6 @@ abstract class BaseService
     {
         $this->modelData = $this->request->only($this->repository->getFillable());
 
-        $translationReq = $this->request->only($this->repository->getTranslatable());
-        $translations = array_merge(
-            ['lang_code' => $this->request->input('translations.lang_code', 'vi')],
-            $translationReq
-        );
-
-        $this->request->merge([
-            'translations' => $translations,
-        ]);
-
-        foreach (array_keys($translationReq) as $key) {
-            $this->request->offsetUnset($key);
-        }
-
         return $this;
     }
 
@@ -141,29 +128,6 @@ abstract class BaseService
             : $this->repository->create($this->modelData);
 
         $this->result = $this->model;
-
-        return $this;
-    }
-
-    protected function saveTranslation(): static
-    {
-        $relation = 'translations';
-
-        if ($this->request->has($relation)) {
-            $this->model->{$relation}()->updateOrCreate(
-                [
-                    $this->repository->getModel()->getForeignKey() => $this->model->id,
-                    'lang_code' => $this->request->input('translations.lang_code', app()->getLocale()),
-                ],
-                array_merge(
-                    $this->request->input('translations', []),
-                    [
-                        $this->repository->getModel()->getForeignKey() => $this->model->id,
-                        'lang_code' => $this->request->input('translations.lang_code', app()->getLocale()),
-                    ]
-                )
-            );
-        }
 
         return $this;
     }
@@ -229,6 +193,21 @@ abstract class BaseService
         return $this;
     }
 
+    public function getListQuerySetup(): array
+    {
+        return [
+            'alias' => $this->queryAlias,
+            'searchable' => $this->searchable,
+            'filterable' => $this->filterable,
+            'sortable' => $this->sortable,
+            'selectable' => $this->selectable,
+            'relations' => $this->includable,
+            'defaultSort' => $this->defaultSort,
+            'dateField' => $this->dateField,
+            'maxLimit' => $this->maxPageSize,
+        ];
+    }
+
     private function specificationBuilder(): array
     {
         return $this->buildSpecification($this->request);
@@ -241,10 +220,88 @@ abstract class BaseService
             : new Request($input);
     }
 
+    private function normalizeListRequest(array|Request $input = []): Request
+    {
+        $request = $this->normalizeRequest($input);
+        $payload = $input instanceof Request ? $request->query() : $input;
+
+        if (! is_array($payload)) {
+            $payload = [];
+        }
+
+        $payload = $this->normalizeListPayload($payload);
+
+        return new Request($payload);
+    }
+
+    protected function normalizeListPayload(array $payload): array
+    {
+        $normalized = $payload;
+
+        if (! array_key_exists('search', $normalized) && array_key_exists('keyword', $normalized)) {
+            $normalized['search'] = $normalized['keyword'];
+        }
+
+        if (! array_key_exists('limit', $normalized) && array_key_exists('per_page', $normalized)) {
+            $normalized['limit'] = $normalized['per_page'];
+        }
+
+        if (! array_key_exists('sort', $normalized)) {
+            $legacySortBy = $normalized['sort_by'] ?? $normalized['sort_field'] ?? null;
+            if (is_string($legacySortBy) && trim($legacySortBy) !== '') {
+                $legacyDirection = strtolower((string) ($normalized['sort_direction'] ?? $normalized['sort_order'] ?? 'asc'));
+                $normalized['sort'] = ($legacyDirection === 'desc' ? '-' : '').trim($legacySortBy);
+            }
+        }
+
+        if (isset($normalized['include']) && is_array($normalized['include'])) {
+            $normalized['include'] = implode(',', array_filter(array_map('trim', $normalized['include'])));
+        }
+
+        if (isset($normalized['fields']) && is_array($normalized['fields'])) {
+            $normalized['fields'] = implode(',', array_filter(array_map('trim', $normalized['fields'])));
+        }
+
+        return $normalized;
+    }
+
     public function with(array $relations): static
     {
         $this->with = $relations;
 
         return $this;
+    }
+
+    protected function bootstrapListQueryConfiguration(): void
+    {
+        $attribute = $this->resolveListQueryAttribute();
+        if (! $attribute) {
+            return;
+        }
+
+        $this->querySetup = $attribute;
+        $this->queryAlias = $attribute->alias;
+
+        $this->searchable = $attribute->searchable;
+        $this->filterable = $attribute->filterable;
+        $this->sortable = $attribute->sortable;
+        $this->selectable = $attribute->selectable;
+        $this->includable = $attribute->relations;
+        $this->defaultSort = $attribute->defaultSort;
+        $this->dateField = $attribute->dateField;
+        $this->maxPageSize = $attribute->maxLimit;
+    }
+
+    protected function resolveListQueryAttribute(): ?ListQueryConfig
+    {
+        $reflection = new \ReflectionClass($this);
+        $attributes = $reflection->getAttributes(ListQueryConfig::class);
+        if ($attributes === []) {
+            return null;
+        }
+
+        $instance = $attributes[0]->newInstance();
+
+        return $instance instanceof ListQueryConfig ? $instance : null;
     }
 }

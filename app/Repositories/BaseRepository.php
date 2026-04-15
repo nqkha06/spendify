@@ -107,6 +107,10 @@ class BaseRepository implements BaseRepositoryInterface
 
     protected function applySpecification(Builder $query, array $specification): Builder
     {
+        if (! empty($specification['select']) && is_array($specification['select'])) {
+            $this->applySelects($query, $specification['select']);
+        }
+
         if (! empty($specification['with']) && is_array($specification['with'])) {
             $query->with($specification['with']);
         }
@@ -403,7 +407,19 @@ class BaseRepository implements BaseRepositoryInterface
 
     protected function isMainColumnField(string $field): bool
     {
-        return in_array($field, $this->getFillable(), true) || $field === $this->model->getKeyName();
+        if (in_array($field, $this->getFillable(), true) || $field === $this->model->getKeyName()) {
+            return true;
+        }
+
+        if ($this->model->usesTimestamps() && in_array($field, ['created_at', 'updated_at'], true)) {
+            return true;
+        }
+
+        if (method_exists($this->model, 'getDeletedAtColumn') && $field === $this->model->getDeletedAtColumn()) {
+            return true;
+        }
+
+        return false;
     }
 
     protected function isTranslatableField(string $field): bool
@@ -416,5 +432,28 @@ class BaseRepository implements BaseRepositoryInterface
         unset($this->query);
 
         return $this->getQuery();
+    }
+
+    protected function applySelects(Builder $query, array $fields): void
+    {
+        $columns = [];
+        foreach ($fields as $field) {
+            if (! is_string($field) || $field === '' || $this->isRelationField($field)) {
+                continue;
+            }
+
+            if ($this->isMainColumnField($field)) {
+                $columns[] = $field;
+            }
+        }
+
+        $keyName = $this->model->getKeyName();
+        if (! in_array($keyName, $columns, true)) {
+            $columns[] = $keyName;
+        }
+
+        if ($columns !== []) {
+            $query->select(array_values(array_unique($columns)));
+        }
     }
 }

@@ -1,6 +1,5 @@
 import { Head, useForm } from '@inertiajs/react';
-import { useMemo, useState  } from 'react';
-import type {FormEventHandler} from 'react';
+import type { FormEventHandler } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,29 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import AdminLayout from '@/layouts/admin';
 import adminPages from '@/routes/admin/pages';
-import type {BreadcrumbItem} from '@/types';
-
-interface Language {
-    id: number;
-    name: string;
-    code: string;
-    locale: string;
-    is_default: boolean;
-}
-
-interface Props {
-    languages: Language[];
-    default_locale?: string;
-}
-
-type TranslationFields = {
-    title: string;
-    slug: string;
-    content: string;
-    meta_title: string;
-    meta_description: string;
-    meta_keywords: string;
-};
+import type { BreadcrumbItem } from '@/types';
 
 const STATUS_OPTIONS = [
     { value: 'published', label: 'Published' },
@@ -44,64 +21,32 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Create', href: adminPages.create().url },
 ];
 
-export default function CreatePage({ languages, default_locale }: Props) {
-    const fallbackLocale = useMemo(
-        () => default_locale || languages.find((l) => l.is_default)?.code || languages[0]?.code || 'en',
-        [default_locale, languages]
-    );
-
-    const emptyTranslations = useMemo(() => {
-        const base: Record<string, TranslationFields> = {};
-        languages.forEach((lang) => {
-            base[lang.code] = {
-                title: '',
-                slug: '',
-                content: '',
-                meta_title: '',
-                meta_description: '',
-                meta_keywords: '',
-            };
-        });
-        return base;
-    }, [languages]);
-
+export default function CreatePage() {
     const { data, setData, post, processing, errors } = useForm({
         status: 'draft',
+        title: '',
+        slug: '',
         image: '',
+        content: '',
+        meta_title: '',
+        meta_description: '',
+        meta_keywords: '',
         tags: '',
-        translations: emptyTranslations,
     });
-
-    const [activeLocale, setActiveLocale] = useState<string>(fallbackLocale);
-
-    const updateTranslation = (locale: string, field: keyof TranslationFields, value: string) => {
-        setData('translations', {
-            ...(data.translations || {}),
-            [locale]: {
-                ...(data.translations?.[locale] || emptyTranslations[locale]),
-                [field]: value,
-            },
-        });
-    };
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         post(adminPages.store().url);
     };
 
-    const tErrors = (field: keyof TranslationFields) =>
-        errors[`translations.${activeLocale}.${field}` as keyof typeof errors] as string | undefined;
-
-    const current = data.translations?.[activeLocale] || emptyTranslations[activeLocale];
-
     return (
         <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Page" />
-            <div className="flex flex-1 flex-col gap-4 sm:gap-6 p-4">
+            <div className="flex flex-1 flex-col gap-4 p-4 sm:gap-6">
                 <div className="flex flex-wrap items-end justify-between gap-2">
                     <div>
                         <h2 className="text-2xl font-bold tracking-tight">Create Page</h2>
-                        <p className="text-muted-foreground">Add a new page with multi-language content.</p>
+                        <p className="text-muted-foreground">Add a new page.</p>
                     </div>
                 </div>
 
@@ -119,18 +64,40 @@ export default function CreatePage({ languages, default_locale }: Props) {
                                             <SelectValue placeholder="Select status" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {STATUS_OPTIONS.map((opt) => (
-                                                <SelectItem key={opt.value} value={opt.value}>
-                                                    {opt.label}
+                                            {STATUS_OPTIONS.map((option) => (
+                                                <SelectItem key={option.value} value={option.value}>
+                                                    {option.label}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    {errors.status && (
-                                        <p className="text-sm text-destructive">{errors.status as string}</p>
-                                    )}
+                                    {errors.status && <p className="text-sm text-destructive">{errors.status as string}</p>}
                                 </div>
 
+                                <div className="grid gap-2">
+                                    <Label htmlFor="title">Title</Label>
+                                    <Input
+                                        id="title"
+                                        value={data.title}
+                                        onChange={(e) => setData('title', e.target.value)}
+                                        required
+                                    />
+                                    {errors.title && <p className="text-sm text-destructive">{errors.title as string}</p>}
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="slug">Slug</Label>
+                                    <Input
+                                        id="slug"
+                                        value={data.slug}
+                                        onChange={(e) => setData('slug', e.target.value)}
+                                        placeholder="my-awesome-page"
+                                    />
+                                    {errors.slug && <p className="text-sm text-destructive">{errors.slug as string}</p>}
+                                </div>
+                            </div>
+
+                            <div className="grid gap-4 md:grid-cols-2">
                                 <div className="grid gap-2">
                                     <Label htmlFor="image">Image URL</Label>
                                     <Input
@@ -139,9 +106,7 @@ export default function CreatePage({ languages, default_locale }: Props) {
                                         onChange={(e) => setData('image', e.target.value)}
                                         placeholder="https://..."
                                     />
-                                    {errors.image && (
-                                        <p className="text-sm text-destructive">{errors.image as string}</p>
-                                    )}
+                                    {errors.image && <p className="text-sm text-destructive">{errors.image as string}</p>}
                                 </div>
 
                                 <div className="grid gap-2">
@@ -152,106 +117,52 @@ export default function CreatePage({ languages, default_locale }: Props) {
                                         onChange={(e) => setData('tags', e.target.value)}
                                         placeholder="news, releases"
                                     />
-                                    {errors.tags && (
-                                        <p className="text-sm text-destructive">{errors.tags as string}</p>
+                                    {errors.tags && <p className="text-sm text-destructive">{errors.tags as string}</p>}
+                                </div>
+
+                                <div className="md:col-span-2 grid gap-2">
+                                    <Label htmlFor="content">Content</Label>
+                                    <Textarea
+                                        id="content"
+                                        value={data.content}
+                                        onChange={(e) => setData('content', e.target.value)}
+                                        rows={6}
+                                    />
+                                    {errors.content && <p className="text-sm text-destructive">{errors.content as string}</p>}
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="meta_title">Meta Title</Label>
+                                    <Input
+                                        id="meta_title"
+                                        value={data.meta_title}
+                                        onChange={(e) => setData('meta_title', e.target.value)}
+                                    />
+                                    {errors.meta_title && <p className="text-sm text-destructive">{errors.meta_title as string}</p>}
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="meta_keywords">Meta Keywords</Label>
+                                    <Input
+                                        id="meta_keywords"
+                                        value={data.meta_keywords}
+                                        onChange={(e) => setData('meta_keywords', e.target.value)}
+                                        placeholder="seo, marketing"
+                                    />
+                                    {errors.meta_keywords && <p className="text-sm text-destructive">{errors.meta_keywords as string}</p>}
+                                </div>
+
+                                <div className="md:col-span-2 grid gap-2">
+                                    <Label htmlFor="meta_description">Meta Description</Label>
+                                    <Textarea
+                                        id="meta_description"
+                                        value={data.meta_description}
+                                        onChange={(e) => setData('meta_description', e.target.value)}
+                                        rows={4}
+                                    />
+                                    {errors.meta_description && (
+                                        <p className="text-sm text-destructive">{errors.meta_description as string}</p>
                                     )}
-                                </div>
-                            </div>
-
-                            <div className="space-y-4">
-                                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-                                    <Label className="text-sm font-medium">Language</Label>
-                                    <Select value={activeLocale} onValueChange={setActiveLocale}>
-                                        <SelectTrigger className="w-full sm:w-60">
-                                            <SelectValue placeholder="Choose language" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {languages.map((lang) => (
-                                                <SelectItem key={lang.code} value={lang.code}>
-                                                    {lang.name} ({lang.code})
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-
-                                <div className="grid gap-4 md:grid-cols-2">
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="title">Title</Label>
-                                        <Input
-                                            id="title"
-                                            value={current.title}
-                                            onChange={(e) => updateTranslation(activeLocale, 'title', e.target.value)}
-                                            required
-                                        />
-                                        {tErrors('title') && (
-                                            <p className="text-sm text-destructive">{tErrors('title')}</p>
-                                        )}
-                                    </div>
-
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="slug">Slug</Label>
-                                        <Input
-                                            id="slug"
-                                            value={current.slug}
-                                            onChange={(e) => updateTranslation(activeLocale, 'slug', e.target.value)}
-                                            placeholder="my-awesome-page"
-                                        />
-                                        {tErrors('slug') && (
-                                            <p className="text-sm text-destructive">{tErrors('slug')}</p>
-                                        )}
-                                    </div>
-
-                                    <div className="md:col-span-2 grid gap-2">
-                                        <Label htmlFor="content">Content</Label>
-                                        <Textarea
-                                            id="content"
-                                            value={current.content}
-                                            onChange={(e) => updateTranslation(activeLocale, 'content', e.target.value)}
-                                            rows={6}
-                                        />
-                                        {tErrors('content') && (
-                                            <p className="text-sm text-destructive">{tErrors('content')}</p>
-                                        )}
-                                    </div>
-
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="meta_title">Meta Title</Label>
-                                        <Input
-                                            id="meta_title"
-                                            value={current.meta_title}
-                                            onChange={(e) => updateTranslation(activeLocale, 'meta_title', e.target.value)}
-                                        />
-                                        {tErrors('meta_title') && (
-                                            <p className="text-sm text-destructive">{tErrors('meta_title')}</p>
-                                        )}
-                                    </div>
-
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="meta_keywords">Meta Keywords</Label>
-                                        <Input
-                                            id="meta_keywords"
-                                            value={current.meta_keywords}
-                                            onChange={(e) => updateTranslation(activeLocale, 'meta_keywords', e.target.value)}
-                                            placeholder="seo, marketing"
-                                        />
-                                        {tErrors('meta_keywords') && (
-                                            <p className="text-sm text-destructive">{tErrors('meta_keywords')}</p>
-                                        )}
-                                    </div>
-
-                                    <div className="md:col-span-2 grid gap-2">
-                                        <Label htmlFor="meta_description">Meta Description</Label>
-                                        <Textarea
-                                            id="meta_description"
-                                            value={current.meta_description}
-                                            onChange={(e) => updateTranslation(activeLocale, 'meta_description', e.target.value)}
-                                            rows={4}
-                                        />
-                                        {tErrors('meta_description') && (
-                                            <p className="text-sm text-destructive">{tErrors('meta_description')}</p>
-                                        )}
-                                    </div>
                                 </div>
                             </div>
 
