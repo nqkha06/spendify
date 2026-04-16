@@ -4,22 +4,119 @@ import React, { useEffect } from 'react';
 import { login, register } from '@/routes';
 import expense from '@/routes/expense';
 
+interface PublicMenuChild {
+    id: number;
+    title: string;
+    url: string | null;
+    target: '_self' | '_blank';
+}
+
+interface PublicMenuItem extends PublicMenuChild {
+    children: PublicMenuChild[];
+}
+
+const defaultHeaderMenus: PublicMenuItem[] = [
+    { id: 1, title: 'Tính năng', url: '/#features', target: '_self', children: [] },
+    { id: 2, title: 'Cách hoạt động', url: '/#how-it-works', target: '_self', children: [] },
+    { id: 3, title: 'Câu hỏi thường gặp', url: '/#templates', target: '_self', children: [] },
+    { id: 4, title: 'Liên hệ', url: '/#contact', target: '_self', children: [] },
+];
+
+const defaultFooterMenus: PublicMenuItem[] = [
+    {
+        id: 11,
+        title: 'Sản phẩm',
+        url: null,
+        target: '_self',
+        children: [
+            { id: 111, title: 'Cách hoạt động', url: '/#how-it-works', target: '_self' },
+            { id: 112, title: 'Bảng xếp hạng', url: '/leaderboard', target: '_self' },
+        ],
+    },
+    {
+        id: 12,
+        title: 'Công ty',
+        url: null,
+        target: '_self',
+        children: [
+            { id: 121, title: 'Về chúng tôi', url: '/about', target: '_self' },
+            { id: 122, title: 'Liên hệ', url: '/#contact', target: '_self' },
+        ],
+    },
+    {
+        id: 13,
+        title: 'Hỗ trợ',
+        url: null,
+        target: '_self',
+        children: [
+            { id: 131, title: 'Trung tâm trợ giúp', url: '#', target: '_self' },
+            { id: 132, title: 'Chính sách bảo mật', url: '#', target: '_self' },
+        ],
+    },
+];
+
+function isExternalUrl(url: string): boolean {
+    return /^https?:\/\//.test(url);
+}
+
+function MenuLink({
+    item,
+    className,
+}: {
+    item: { title: string; url: string | null; target: '_self' | '_blank' };
+    className: string;
+}) {
+    const href = item.url?.trim() || '#';
+
+    if (isExternalUrl(href)) {
+        return (
+            <a
+                href={href}
+                target={item.target}
+                rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
+                className={className}
+            >
+                {item.title}
+            </a>
+        );
+    }
+
+    if (href.startsWith('/')) {
+        return (
+            <Link href={href} className={className}>
+                {item.title}
+            </Link>
+        );
+    }
+
+    return (
+        <a href={href} className={className}>
+            {item.title}
+        </a>
+    );
+}
+
 interface LayoutProps {
     children: React.ReactNode;
     title?: string;
-    showFooter?: boolean;
 }
 
 export default function Layout({
     children,
     title = 'Spendify - Quan ly chi tieu ca nhan',
 }: LayoutProps) {
-    const { auth } = usePage().props as {
+    const { auth, publicMenus } = usePage().props as {
         auth?: {
             user?: unknown | null;
         };
+        publicMenus?: {
+            homeHeader?: PublicMenuItem[];
+            homeFooter?: PublicMenuItem[];
+        };
     };
     const isAuthenticated = Boolean(auth?.user);
+    const headerMenus = publicMenus?.homeHeader?.length ? publicMenus.homeHeader : defaultHeaderMenus;
+    const footerMenus = publicMenus?.homeFooter?.length ? publicMenus.homeFooter : defaultFooterMenus;
 
     useEffect(() => {
         const backToTopBtn = document.getElementById('backToTop');
@@ -61,10 +158,23 @@ export default function Layout({
                     </Link>
 
                     <div className="hidden md:flex items-center gap-8 font-medium text-slate-600">
-                        <a href="/#features" className="hover:text-brand-600 transition-colors">Tính năng</a>
-                        <a href="/#how-it-works" className="hover:text-brand-600 transition-colors">Cách hoạt động</a>
-                        <a href="/#templates" className="hover:text-brand-600 transition-colors">Câu hỏi thường gặp</a>
-                        <a href="/#contact" className="hover:text-brand-600 transition-colors">Liên hệ</a>
+                        {headerMenus.map((menu) => (
+                            <div key={menu.id} className="group relative">
+                                <MenuLink item={menu} className="hover:text-brand-600 transition-colors" />
+
+                                {menu.children.length > 0 && (
+                                    <div className="invisible absolute left-0 top-full z-50 mt-2 w-52 rounded-xl border border-gray-200 bg-white p-2 opacity-0 shadow-lg transition-all duration-150 group-hover:visible group-hover:opacity-100">
+                                        {menu.children.map((child) => (
+                                            <MenuLink
+                                                key={child.id}
+                                                item={child}
+                                                className="block rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-brand-600"
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -90,6 +200,7 @@ export default function Layout({
             </main>
 
             {/* Footer */}
+
             <footer className="bg-white pt-20 pb-10 border-t border-gray-200 mt-auto">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="grid grid-cols-2 lg:grid-cols-5 gap-10 mb-16">
@@ -117,37 +228,24 @@ export default function Layout({
                             </div>
                         </div>
 
-                        {/* Links */}
-                        <div>
-                            <h4 className="font-bold text-slate-900 mb-6">Sản phẩm</h4>
-                            <ul className="space-y-4 text-sm text-slate-500">
-                                <li><a href="/#how-it-works" className="hover:text-brand-600 transition-colors">Cách hoạt động</a></li>
-                                <li><Link href="/leaderboard" className="hover:text-brand-600 transition-colors">Bảng xếp hạng</Link></li>
-                                <li><a href="#" className="hover:text-brand-600 transition-colors">Tiện ích trình duyệt</a></li>
-                                <li><a href="#" className="hover:text-brand-600 transition-colors">Ứng dụng di động</a></li>
-                                <li><a href="#" className="hover:text-brand-600 transition-colors">Giới thiệu bạn bè</a></li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4 className="font-bold text-slate-900 mb-6">Công ty</h4>
-                            <ul className="space-y-4 text-sm text-slate-500">
-                                <li><Link href="/about" className="hover:text-brand-600 transition-colors">Về chúng tôi</Link></li>
-                                <li><a href="#" className="hover:text-brand-600 transition-colors">Tuyển dụng</a></li>
-                                <li><a href="#" className="hover:text-brand-600 transition-colors">Báo chí</a></li>
-                                <li><a href="#" className="hover:text-brand-600 transition-colors">Liên hệ</a></li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4 className="font-bold text-slate-900 mb-6">Hỗ trợ</h4>
-                            <ul className="space-y-4 text-sm text-slate-500">
-                                <li><a href="#" className="hover:text-brand-600 transition-colors">Trung tâm trợ giúp</a></li>
-                                <li><a href="#" className="hover:text-brand-600 transition-colors">Giao dịch bị thiếu</a></li>
-                                <li><a href="#" className="hover:text-brand-600 transition-colors">Chính sách bảo mật</a></li>
-                                <li><a href="#" className="hover:text-brand-600 transition-colors">Điều khoản sử dụng</a></li>
-                            </ul>
-                        </div>
+                        {footerMenus.map((menu) => (
+                            <div key={menu.id}>
+                                <h4 className="font-bold text-slate-900 mb-6">{menu.title}</h4>
+                                <ul className="space-y-4 text-sm text-slate-500">
+                                    {menu.children.length > 0 ? (
+                                        menu.children.map((child) => (
+                                            <li key={child.id}>
+                                                <MenuLink item={child} className="hover:text-brand-600 transition-colors" />
+                                            </li>
+                                        ))
+                                    ) : (
+                                        <li>
+                                            <MenuLink item={menu} className="hover:text-brand-600 transition-colors" />
+                                        </li>
+                                    )}
+                                </ul>
+                            </div>
+                        ))}
                     </div>
 
                     <div className="border-t border-gray-200 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
@@ -163,6 +261,7 @@ export default function Layout({
                     </div>
                 </div>
             </footer>
+
 
             {/* Back to Top */}
             <button

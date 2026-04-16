@@ -1,7 +1,9 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
+import { useMemo } from 'react';
 import type { FormEventHandler } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import RichTextEditor from '@/components/editor/rich-text-editor';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -39,6 +41,25 @@ export default function CreatePage() {
         post(adminPages.store().url);
     };
 
+    const submitAndExit = () => {
+        post(adminPages.store().url, {
+            onSuccess: () => {
+                router.visit(adminPages.index().url);
+            },
+        });
+    };
+
+    const permalinkPreview = useMemo(() => {
+        const slug = data.slug?.trim() || '';
+        const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+
+        if (slug === '' || baseUrl === '') {
+            return null;
+        }
+
+        return `${baseUrl}/${slug}`;
+    }, [data.slug]);
+
     return (
         <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Page" />
@@ -50,30 +71,10 @@ export default function CreatePage() {
                     </div>
                 </div>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Page Details</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={submit} className="space-y-6">
-                            <div className="grid gap-4 md:grid-cols-3">
-                                <div className="grid gap-2">
-                                    <Label>Status</Label>
-                                    <Select value={data.status} onValueChange={(value) => setData('status', value)}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select status" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {STATUS_OPTIONS.map((option) => (
-                                                <SelectItem key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.status && <p className="text-sm text-destructive">{errors.status as string}</p>}
-                                </div>
-
+                <form onSubmit={submit} className="grid gap-4 xl:grid-cols-12">
+                    <div className="space-y-4 xl:col-span-9">
+                        <Card>
+                            <CardContent className="space-y-5 pt-6">
                                 <div className="grid gap-2">
                                     <Label htmlFor="title">Title</Label>
                                     <Input
@@ -86,18 +87,54 @@ export default function CreatePage() {
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="slug">Slug</Label>
+                                    <Label htmlFor="slug">Permalink</Label>
                                     <Input
                                         id="slug"
                                         value={data.slug}
                                         onChange={(e) => setData('slug', e.target.value)}
                                         placeholder="my-awesome-page"
                                     />
+                                    {permalinkPreview && (
+                                        <p className="text-sm text-muted-foreground">
+                                            Preview:{' '}
+                                            <a href={permalinkPreview} className="text-primary hover:underline" target="_blank" rel="noreferrer">
+                                                {permalinkPreview}
+                                            </a>
+                                        </p>
+                                    )}
                                     {errors.slug && <p className="text-sm text-destructive">{errors.slug as string}</p>}
                                 </div>
-                            </div>
 
-                            <div className="grid gap-4 md:grid-cols-2">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="meta_description">Description</Label>
+                                    <Textarea
+                                        id="meta_description"
+                                        value={data.meta_description}
+                                        onChange={(e) => setData('meta_description', e.target.value)}
+                                        rows={3}
+                                    />
+                                    {errors.meta_description && (
+                                        <p className="text-sm text-destructive">{errors.meta_description as string}</p>
+                                    )}
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="content">Content</Label>
+                                    <RichTextEditor
+                                        value={data.content}
+                                        onChange={(value) => setData('content', value)}
+                                        placeholder="Write your page content..."
+                                    />
+                                    {errors.content && <p className="text-sm text-destructive">{errors.content as string}</p>}
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>SEO & Media</CardTitle>
+                            </CardHeader>
+                            <CardContent className="grid gap-4 md:grid-cols-2">
                                 <div className="grid gap-2">
                                     <Label htmlFor="image">Image URL</Label>
                                     <Input
@@ -120,17 +157,6 @@ export default function CreatePage() {
                                     {errors.tags && <p className="text-sm text-destructive">{errors.tags as string}</p>}
                                 </div>
 
-                                <div className="md:col-span-2 grid gap-2">
-                                    <Label htmlFor="content">Content</Label>
-                                    <Textarea
-                                        id="content"
-                                        value={data.content}
-                                        onChange={(e) => setData('content', e.target.value)}
-                                        rows={6}
-                                    />
-                                    {errors.content && <p className="text-sm text-destructive">{errors.content as string}</p>}
-                                </div>
-
                                 <div className="grid gap-2">
                                     <Label htmlFor="meta_title">Meta Title</Label>
                                     <Input
@@ -151,32 +177,47 @@ export default function CreatePage() {
                                     />
                                     {errors.meta_keywords && <p className="text-sm text-destructive">{errors.meta_keywords as string}</p>}
                                 </div>
+                            </CardContent>
+                        </Card>
+                    </div>
 
-                                <div className="md:col-span-2 grid gap-2">
-                                    <Label htmlFor="meta_description">Meta Description</Label>
-                                    <Textarea
-                                        id="meta_description"
-                                        value={data.meta_description}
-                                        onChange={(e) => setData('meta_description', e.target.value)}
-                                        rows={4}
-                                    />
-                                    {errors.meta_description && (
-                                        <p className="text-sm text-destructive">{errors.meta_description as string}</p>
-                                    )}
-                                </div>
-                            </div>
+                    <div className="space-y-4 xl:col-span-3">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Publish</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                <Button type="submit" className="w-full" disabled={processing}>
+                                    Save
+                                </Button>
+                                <Button type="button" variant="outline" className="w-full" onClick={submitAndExit} disabled={processing}>
+                                    Save & Exit
+                                </Button>
+                            </CardContent>
+                        </Card>w
 
-                            <div className="flex gap-2">
-                                <Button type="submit" disabled={processing}>
-                                    Create Page
-                                </Button>
-                                <Button type="button" variant="outline" onClick={() => window.history.back()}>
-                                    Cancel
-                                </Button>
-                            </div>
-                        </form>
-                    </CardContent>
-                </Card>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Status</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-2">
+                                <Select value={data.status} onValueChange={(value) => setData('status', value)}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {STATUS_OPTIONS.map((option) => (
+                                            <SelectItem key={option.value} value={option.value}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {errors.status && <p className="text-sm text-destructive">{errors.status as string}</p>}
+                            </CardContent>
+                        </Card>
+                    </div>
+                </form>
             </div>
         </AdminLayout>
     );

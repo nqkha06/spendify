@@ -34,21 +34,42 @@ import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
 import { cn, toUrl } from '@/lib/utils';
 import expense from '@/routes/expense';
-import type { BreadcrumbItem, NavItem } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 
 type Props = {
     breadcrumbs?: BreadcrumbItem[];
 };
 
-const mainNavItems: NavItem[] = [
+interface PublicMenuChild {
+    id: number;
+    title: string;
+    url: string | null;
+    target: '_self' | '_blank';
+}
+
+interface PublicMenuItem extends PublicMenuChild {
+    children: PublicMenuChild[];
+}
+
+interface HeaderNavItem {
+    title: string;
+    href: string;
+    icon?: typeof LayoutGrid;
+    children?: Array<{
+        title: string;
+        href: string;
+    }>;
+}
+
+const fallbackMainNavItems: HeaderNavItem[] = [
     {
         title: 'Dashboard',
-        href: expense.dashboard(),
+        href: expense.dashboard().url,
         icon: LayoutGrid,
     },
 ];
 
-const rightNavItems: NavItem[] = [
+const rightNavItems: HeaderNavItem[] = [
     {
         title: 'Repository',
         href: 'https://github.com/laravel/react-starter-kit',
@@ -66,9 +87,41 @@ const activeItemStyles =
 
 export function AppHeader({ breadcrumbs = [] }: Props) {
     const page = usePage();
-    const { auth } = page.props;
+    const { auth, publicMenus } = page.props as {
+        auth: {
+            user: any;
+        };
+        publicMenus?: {
+            userHeader?: PublicMenuItem[];
+        };
+    };
     const getInitials = useInitials();
     const { isCurrentUrl, whenCurrentUrl } = useCurrentUrl();
+
+    const mainNavItems: HeaderNavItem[] =
+        publicMenus?.userHeader && publicMenus.userHeader.length > 0
+            ? publicMenus.userHeader.map((menu) => ({
+                title: menu.title,
+                href: menu.url || '#',
+                children: menu.children.map((child) => ({
+                    title: child.title,
+                    href: child.url || '#',
+                })),
+            }))
+            : fallbackMainNavItems;
+
+    const toHref = (href?: string): string => {
+        if (! href) {
+            return '#';
+        }
+
+        if (href.startsWith('/')) {
+            return href;
+        }
+
+        return toUrl(href);
+    };
+
     return (
         <>
             <div className="border-b border-sidebar-border/80">
@@ -99,16 +152,31 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     <div className="flex h-full flex-col justify-between text-sm">
                                         <div className="flex flex-col space-y-4">
                                             {mainNavItems.map((item) => (
-                                                <Link
-                                                    key={item.title}
-                                                    href={item.href}
-                                                    className="flex items-center space-x-2 font-medium"
-                                                >
-                                                    {item.icon && (
-                                                        <item.icon className="h-5 w-5" />
+                                                <div key={item.title} className="space-y-2">
+                                                    <Link
+                                                        href={toHref(item.href)}
+                                                        className="flex items-center space-x-2 font-medium"
+                                                    >
+                                                        {item.icon && (
+                                                            <item.icon className="h-5 w-5" />
+                                                        )}
+                                                        <span>{item.title}</span>
+                                                    </Link>
+
+                                                    {item.children && item.children.length > 0 && (
+                                                        <div className="ml-4 flex flex-col space-y-2 border-l border-sidebar-border/80 pl-3">
+                                                            {item.children.map((child) => (
+                                                                <Link
+                                                                    key={child.title}
+                                                                    href={toHref(child.href)}
+                                                                    className="text-sm text-muted-foreground hover:text-foreground"
+                                                                >
+                                                                    {child.title}
+                                                                </Link>
+                                                            ))}
+                                                        </div>
                                                     )}
-                                                    <span>{item.title}</span>
-                                                </Link>
+                                                </div>
                                             ))}
                                         </div>
 
@@ -149,14 +217,19 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 {mainNavItems.map((item, index) => (
                                     <NavigationMenuItem
                                         key={index}
-                                        className="relative flex h-full items-center"
+                                        className="group relative flex h-full items-center"
                                     >
+                                        {(() => {
+                                            const resolvedHref = toHref(item.href);
+
+                                            return (
+                                                <>
                                         <Link
-                                            href={item.href}
+                                            href={resolvedHref}
                                             className={cn(
                                                 navigationMenuTriggerStyle(),
                                                 whenCurrentUrl(
-                                                    item.href,
+                                                    resolvedHref,
                                                     activeItemStyles,
                                                 ),
                                                 'h-9 cursor-pointer px-3',
@@ -167,9 +240,26 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                             )}
                                             {item.title}
                                         </Link>
-                                        {isCurrentUrl(item.href) && (
+                                        {isCurrentUrl(resolvedHref) && (
                                             <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"></div>
                                         )}
+
+                                        {item.children && item.children.length > 0 && (
+                                            <div className="invisible absolute left-0 top-full z-50 mt-1 w-52 rounded-md border border-border bg-background p-2 opacity-0 shadow-md transition-all duration-150 group-hover:visible group-hover:opacity-100">
+                                                {item.children.map((child) => (
+                                                    <Link
+                                                        key={child.title}
+                                                        href={toHref(child.href)}
+                                                        className="block rounded px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                                                    >
+                                                        {child.title}
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        )}
+                                                </>
+                                            );
+                                        })()}
                                     </NavigationMenuItem>
                                 ))}
                             </NavigationMenuList>

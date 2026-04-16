@@ -8,6 +8,7 @@ use App\Models\Budget;
 use App\Models\Category;
 use App\Models\ExpenseTransaction;
 use App\Models\User;
+use App\Services\BudgetService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -16,58 +17,29 @@ use Inertia\Response;
 
 class BudgetController extends Controller
 {
+    protected $service;
+
+    public function __construct(BudgetService $service)
+    {
+        $this->service = $service;
+    }
+
     public function index(Request $request): Response
     {
-        $sortBy = (string) ($request->get('sort_by') ?? 'created_at');
-        $sortDirection = (string) ($request->get('sort_direction') ?? 'desc');
+        $sortBy = (string) $request->get('sort_by', 'created_at');
+        $sortDirection = (string) $request->get('sort_direction', 'desc');
+        $perPage = (int) $request->get('per_page', 10);
 
-        if (! in_array($sortBy, ['id', 'amount_limit', 'period', 'status', 'created_at'], true)) {
-            $sortBy = 'created_at';
-        }
-
-        if (! in_array($sortDirection, ['asc', 'desc'], true)) {
-            $sortDirection = 'desc';
-        }
-
-        $perPage = max(1, min(100, $request->integer('per_page', 10)));
-
-        $budgets = Budget::query()
-            ->with([
-                'user:id,name,email',
-                'category:id,name,color',
-            ])
-            ->when($request->filled('search'), function ($query) use ($request) {
-                $term = trim((string) $request->input('search'));
-
-                $query->where(function ($nested) use ($term) {
-                    $nested
-                        ->where('note', 'like', "%{$term}%")
-                        ->orWhereHas('user', function ($userQuery) use ($term) {
-                            $userQuery
-                                ->where('name', 'like', "%{$term}%")
-                                ->orWhere('email', 'like', "%{$term}%");
-                        })
-                        ->orWhereHas('category', function ($categoryQuery) use ($term) {
-                            $categoryQuery->where('name', 'like', "%{$term}%");
-                        });
-                });
-            })
-            ->when($request->filled('period'), function ($query) use ($request) {
-                $query->where('period', (string) $request->input('period'));
-            })
-            ->when($request->filled('status'), function ($query) use ($request) {
-                $query->where('status', (string) $request->input('status'));
-            })
-            ->when($request->filled('user_id'), function ($query) use ($request) {
-                $query->where('user_id', (int) $request->input('user_id'));
-            })
-            ->when($request->filled('category_id'), function ($query) use ($request) {
-                $query->where('category_id', (int) $request->input('category_id'));
-            })
-            ->orderBy($sortBy, $sortDirection)
-            ->orderBy('id', 'desc')
-            ->paginate($perPage)
-            ->withQueryString();
+        $budgets = $this->service->paginate([
+            'search' => $request->get('search'),
+            'period' => $request->get('period'),
+            'status' => $request->get('status'),
+            'user_id' => $request->get('user_id'),
+            'category_id' => $request->get('category_id'),
+            'sort_by' => $sortBy,
+            'sort_direction' => $sortDirection,
+            'per_page' => $perPage,
+        ]);
 
         $spentByBudget = $this->calculateSpentForBudgets($budgets->getCollection());
 

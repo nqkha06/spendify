@@ -9,6 +9,7 @@ import {
     Tags,
     PiggyBank,
     ReceiptText,
+    ListTree,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
@@ -29,12 +30,14 @@ import adminRoles from '@/routes/admin/roles';
 import adminAppearance from '@/routes/admin/settings/appearance/options';
 import adminTransactions from '@/routes/admin/transactions';
 import adminUsers from '@/routes/admin/users';
+import adminPages from '@/routes/admin/pages';
+import adminMenus from '@/routes/admin/menus';
 import type { NavItem } from '@/types';
 
 const adminNavItems: NavItem[] = [
     {
-        title: 'Access Control',
-        icon: Shield,
+        title: 'Users',
+        icon: Users,
         children: [
             {
                 title: 'Users',
@@ -85,11 +88,16 @@ const adminNavItems: NavItem[] = [
             },
         ],
     },
-    // {
-    //     title: 'Pages',
-    //     href: adminPages.index().url,
-    //     icon: Users,
-    // },
+    {
+        title: 'Pages',
+        href: adminPages.index().url,
+        icon: Folder,
+    },
+    {
+        title: 'Menus',
+        href: adminMenus.index().url,
+        icon: ListTree,
+    },
     // {
     //     title: 'Settings',
     //     icon: Settings,

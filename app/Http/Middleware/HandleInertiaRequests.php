@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Menu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Middleware;
@@ -55,10 +56,47 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'publicMenus' => fn (): array => [
+                'homeHeader' => $this->publicMenus('home.header'),
+                'homeFooter' => $this->publicMenus('home.footer'),
+                'userHeader' => $this->publicMenus('user.header'),
+            ],
             'navigation' => fn (): ?array => $this->expenseNavigation($request),
             'profile' => fn (): ?array => $this->expenseProfile($request),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
+    }
+
+    private function publicMenus(string $canonical): array
+    {
+        return Menu::query()
+            ->where('canonical', $canonical)
+            ->where('status', 'active')
+            ->whereNull('parent_id')
+            ->with([
+                'children' => fn ($query) => $query
+                    ->where('status', 'active')
+                    ->orderBy('sort_order')
+                    ->orderBy('id'),
+            ])
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get()
+            ->map(fn (Menu $menu): array => [
+                'id' => $menu->id,
+                'title' => $menu->title,
+                'url' => $menu->url,
+                'target' => $menu->target,
+                'canonical' => $menu->canonical,
+                'children' => $menu->children->map(fn (Menu $child): array => [
+                    'id' => $child->id,
+                    'title' => $child->title,
+                    'url' => $child->url,
+                    'target' => $child->target,
+                    'canonical' => $child->canonical,
+                ])->all(),
+            ])
+            ->all();
     }
 
     private function expenseNavigation(Request $request): ?array

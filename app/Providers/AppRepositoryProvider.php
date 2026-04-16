@@ -16,6 +16,14 @@ class AppRepositoryProvider extends ServiceProvider
 
         'App\Repositories\Contracts\PageRepositoryInterface' => 'App\Repositories\PageRepository',
 
+        'App\Repositories\Contracts\CategoryRepositoryInterface' => 'App\Repositories\CategoryRepository',
+
+        'App\Repositories\Contracts\BudgetRepositoryInterface' => 'App\Repositories\BudgetRepository',
+
+        'App\Repositories\Contracts\ExpenseTransactionRepositoryInterface' => 'App\Repositories\ExpenseTransactionRepository',
+
+        'App\Repositories\Contracts\MenuRepositoryInterface' => 'App\Repositories\MenuRepository',
+
     ];
 
     public function register(): void

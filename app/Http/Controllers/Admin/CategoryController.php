@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\CategoryRequest;
 use App\Models\Category;
+use App\Services\CategoryService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,33 +13,29 @@ use Inertia\Response;
 
 class CategoryController extends Controller
 {
+    protected $service;
+
+    public function __construct(CategoryService $service)
+    {
+        $this->service = $service;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request): Response
     {
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortDirection = $request->get('sort_direction', 'desc');
+        $sortBy = (string) $request->get('sort_by', 'created_at');
+        $sortDirection = (string) $request->get('sort_direction', 'desc');
+        $perPage = (int) $request->get('per_page', 10);
 
-        if (! in_array($sortBy, ['name', 'status', 'created_at', 'id'], true)) {
-            $sortBy = 'created_at';
-        }
-
-        if (! in_array($sortDirection, ['asc', 'desc'], true)) {
-            $sortDirection = 'desc';
-        }
-
-        $categories = Category::query()
-            ->when($request->filled('search'), function ($query) use ($request) {
-                $term = trim((string) $request->input('search'));
-                $query->where('name', 'like', "%{$term}%");
-            })
-            ->when($request->filled('status'), function ($query) use ($request) {
-                $query->where('status', $request->input('status'));
-            })
-            ->orderBy($sortBy, $sortDirection)
-            ->paginate($request->integer('per_page', 10))
-            ->withQueryString();
+        $categories = $this->service->paginate([
+            'search' => $request->get('search'),
+            'status' => $request->get('status'),
+            'sort_by' => $sortBy,
+            'sort_direction' => $sortDirection,
+            'per_page' => $perPage,
+        ]);
 
         return Inertia::render('Admin/categories/list', [
             'categories' => $categories->items(),
@@ -55,6 +52,7 @@ class CategoryController extends Controller
                 'status' => $request->input('status'),
                 'sort_by' => $sortBy,
                 'sort_direction' => $sortDirection,
+                'per_page' => $perPage,
             ],
         ]);
     }

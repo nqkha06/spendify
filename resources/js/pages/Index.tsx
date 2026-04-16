@@ -178,7 +178,7 @@ const logos = ['Stellar', 'Northwind', 'NovaPay', 'Lumen', 'Orbit', 'Finq'];
 
 export default function Index() {
     return (
-        <Layout title="Spendify - Quản lý chi tiêu cá nhân" showFooter={false}>
+        <Layout title="Spendify - Quản lý chi tiêu cá nhân">
             <div className="bg-white text-slate-900">
                 <section className="relative overflow-hidden bg-white pb-16 pt-12 md:pb-24 md:pt-20">
                     <div className="absolute -top-32 right-0 h-72 w-72 rounded-full bg-sky-100/70 blur-3xl" />

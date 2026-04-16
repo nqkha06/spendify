@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\ExpenseTransaction;
 use App\Models\User;
 use App\Models\UserWallet;
+use App\Services\ExpenseTransactionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -15,71 +16,33 @@ use Inertia\Response;
 
 class TransactionController extends Controller
 {
+    protected $service;
+
+    public function __construct(ExpenseTransactionService $service)
+    {
+        $this->service = $service;
+    }
+
     public function index(Request $request): Response
     {
         $sortBy = (string) ($request->get('sort_by') ?? $request->get('sort') ?? 'transacted_at');
         $sortDirection = (string) ($request->get('sort_direction') ?? $request->get('dir') ?? 'desc');
 
-        if (! in_array($sortBy, ['id', 'type', 'amount', 'status', 'transacted_at', 'created_at'], true)) {
-            $sortBy = 'transacted_at';
-        }
+        $perPage = (int) $request->get('per_page', 10);
 
-        if (! in_array($sortDirection, ['asc', 'desc'], true)) {
-            $sortDirection = 'desc';
-        }
-
-        $perPage = max(1, min(100, $request->integer('per_page', 10)));
-
-        $transactions = ExpenseTransaction::query()
-            ->with([
-                'user:id,name,email',
-                'wallet:id,user_id,name,currency',
-                'category:id,name,color',
-            ])
-            ->when($request->filled('search'), function ($query) use ($request) {
-                $term = trim((string) $request->input('search'));
-
-                $query->where(function ($nested) use ($term) {
-                    $nested
-                        ->where('note', 'like', "%{$term}%")
-                        ->orWhereHas('user', function ($userQuery) use ($term) {
-                            $userQuery
-                                ->where('name', 'like', "%{$term}%")
-                                ->orWhere('email', 'like', "%{$term}%");
-                        })
-                        ->orWhereHas('wallet', function ($walletQuery) use ($term) {
-                            $walletQuery->where('name', 'like', "%{$term}%");
-                        })
-                        ->orWhereHas('category', function ($categoryQuery) use ($term) {
-                            $categoryQuery->where('name', 'like', "%{$term}%");
-                        });
-                });
-            })
-            ->when($request->filled('type'), function ($query) use ($request) {
-                $query->where('type', (string) $request->input('type'));
-            })
-            ->when($request->filled('status'), function ($query) use ($request) {
-                $query->where('status', (string) $request->input('status'));
-            })
-            ->when($request->filled('user_id'), function ($query) use ($request) {
-                $query->where('user_id', (int) $request->input('user_id'));
-            })
-            ->when($request->filled('wallet_id'), function ($query) use ($request) {
-                $query->where('wallet_id', (int) $request->input('wallet_id'));
-            })
-            ->when($request->filled('category_id'), function ($query) use ($request) {
-                $query->where('category_id', (int) $request->input('category_id'));
-            })
-            ->when($request->filled('from_date'), function ($query) use ($request) {
-                $query->whereDate('transacted_at', '>=', (string) $request->input('from_date'));
-            })
-            ->when($request->filled('to_date'), function ($query) use ($request) {
-                $query->whereDate('transacted_at', '<=', (string) $request->input('to_date'));
-            })
-            ->orderBy($sortBy, $sortDirection)
-            ->orderBy('id', 'desc')
-            ->paginate($perPage)
-            ->withQueryString();
+        $transactions = $this->service->paginate([
+            'search' => $request->get('search'),
+            'type' => $request->get('type'),
+            'status' => $request->get('status'),
+            'user_id' => $request->get('user_id'),
+            'wallet_id' => $request->get('wallet_id'),
+            'category_id' => $request->get('category_id'),
+            'transacted_at_from' => $request->get('from_date'),
+            'transacted_at_to' => $request->get('to_date'),
+            'sort_by' => $sortBy,
+            'sort_direction' => $sortDirection,
+            'per_page' => $perPage,
+        ]);
 
         return Inertia::render('Admin/transactions/list', [
             'transactions' => $transactions->getCollection()->map(function (ExpenseTransaction $transaction): array {
