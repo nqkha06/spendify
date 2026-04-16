@@ -1,6 +1,6 @@
-import { User, Bell, Shield, Palette, Globe, ChevronRight } from 'lucide-react';
-import { FormEventHandler } from 'react';
 import { useForm } from '@inertiajs/react';
+import { User, Bell, Shield, Palette, Globe, ChevronRight } from 'lucide-react';
+import type { FormEventHandler } from 'react';
 import TrackerLayout from '@/components/expense-tracker/layout';
 import type {
     TrackerNavigationItem,

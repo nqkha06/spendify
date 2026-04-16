@@ -1,9 +1,9 @@
 import { Head, router, useForm } from '@inertiajs/react';
 import { useMemo } from 'react';
 import type { FormEventHandler } from 'react';
+import RichTextEditor from '@/components/editor/rich-text-editor';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import RichTextEditor from '@/components/editor/rich-text-editor';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';

@@ -356,11 +356,11 @@ export default function Index() {
                         <div className="relative overflow-hidden">
                             <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-slate-50 to-transparent" />
                             <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-slate-50 to-transparent" />
-                            <div className="flex w-max gap-6 animate-marquee hover:[animation-play-state:paused]">
+                            <div className="flex w-max gap-6 animate-marquee-force hover:[animation-play-state:paused]">
                                 {testimonialSlides.map((item, index) => (
                                     <article
                                         key={`${item.name}-${index}`}
-                                        className="w-[280px] rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-sm"
+                                        className="w-[280px] shrink-0 rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-sm"
                                     >
                                         <Quote className="mb-4 h-6 w-6 text-slate-300" />
                                         <p className="text-sm leading-relaxed text-slate-600">“{item.content}”</p>

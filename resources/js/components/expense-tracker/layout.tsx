@@ -10,10 +10,10 @@ import {
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type { ComponentType, PropsWithChildren } from 'react';
+import { toast } from 'sonner';
 import TrackerFooter from '@/components/expense-tracker/footer';
 import TrackerHeader from '@/components/expense-tracker/header';
 import { Toaster } from '@/components/ui/sonner';
-import { toast } from 'sonner';
 import type {
     TrackerNavigationItem,
     TrackerProfile,

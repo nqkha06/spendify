@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\Settings\LanguageController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\PublicPageShowController;
 use App\Http\Controllers\User\BudgetStoreController;
 use App\Http\Controllers\User\CategoryListController;
 use App\Http\Controllers\User\ExpenseBudgetsController;
@@ -30,6 +31,10 @@ use Laravel\Fortify\Features;
 Route::inertia('/', 'Index', [
     'canRegister' => Features::enabled(Features::registration()),
 ])->name('home');
+
+Route::get('/p/{slug}', PublicPageShowController::class)
+    ->where('slug', '.*')
+    ->name('pages.show');
 
 Route::prefix('user')->name('expense.')->group(function () {
     Route::get('/', ExpenseHomeController::class)->name('home');

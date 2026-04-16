@@ -23,15 +23,15 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import adminCategories from '@/routes/admin/categories';
 import adminBudgets from '@/routes/admin/budgets';
+import adminCategories from '@/routes/admin/categories';
+import adminMenus from '@/routes/admin/menus';
+import adminPages from '@/routes/admin/pages';
 import adminPermissions from '@/routes/admin/permissions';
 import adminRoles from '@/routes/admin/roles';
 import adminAppearance from '@/routes/admin/settings/appearance/options';
 import adminTransactions from '@/routes/admin/transactions';
 import adminUsers from '@/routes/admin/users';
-import adminPages from '@/routes/admin/pages';
-import adminMenus from '@/routes/admin/menus';
 import type { NavItem } from '@/types';
 
 const adminNavItems: NavItem[] = [

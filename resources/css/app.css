@@ -182,6 +182,11 @@
     .animate-marquee {
         animation: marquee 35s linear infinite;
     }
+
+    .animate-marquee-force {
+        animation: marquee 42s linear infinite;
+        will-change: transform;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
