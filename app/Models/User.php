@@ -70,4 +70,26 @@ class User extends Authenticatable
     {
         return $this->hasMany(Budget::class);
     }
+
+    public function metas(): HasMany
+    {
+        return $this->hasMany(UserMeta::class);
+    }
+
+    public function getMeta(string $key, ?string $default = null): ?string
+    {
+        $meta = $this->metas()
+            ->where('meta_key', $key)
+            ->value('meta_value');
+
+        return $meta ?? $default;
+    }
+
+    public function setMeta(string $key, ?string $value): void
+    {
+        $this->metas()->updateOrCreate(
+            ['meta_key' => $key],
+            ['meta_value' => $value],
+        );
+    }
 }

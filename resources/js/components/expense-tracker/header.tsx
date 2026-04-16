@@ -8,7 +8,6 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { logout } from '@/routes';
-import expense from '@/routes/expense';
 import type {
     TrackerNavigationItem,
     TrackerProfile,
@@ -125,7 +124,7 @@ export default function TrackerHeader({
                             <DropdownMenuSeparator />
                             <DropdownMenuItem asChild>
                                 <Link
-                                    href={expense.settings().url}
+                                        href="/user/settings"
                                     className="cursor-pointer"
                                 >
                                     Cài đặt

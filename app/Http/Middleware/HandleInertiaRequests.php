@@ -56,6 +56,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'userPreferenceCurrency' => fn (): ?string => $request->user()?->getMeta('currency'),
             'publicMenus' => fn (): array => [
                 'homeHeader' => $this->publicMenus('home.header'),
                 'homeFooter' => $this->publicMenus('home.footer'),
@@ -101,7 +102,7 @@ class HandleInertiaRequests extends Middleware
 
     private function expenseNavigation(Request $request): ?array
     {
-        if (! $request->routeIs('expense.*')) {
+        if (! $request->routeIs('expense.*') && ! $request->routeIs('user.settings*')) {
             return null;
         }
 
@@ -110,12 +111,13 @@ class HandleInertiaRequests extends Middleware
             ['label' => 'Giao dịch', 'href' => route('expense.transactions')],
             ['label' => 'Ngân sách', 'href' => route('expense.budgets')],
             ['label' => 'Ví tiền', 'href' => route('expense.wallets')],
+            ['label' => 'Cài đặt', 'href' => route('user.settings')],
         ];
     }
 
     private function expenseProfile(Request $request): ?array
     {
-        if (! $request->routeIs('expense.*')) {
+        if (! $request->routeIs('expense.*') && ! $request->routeIs('user.settings*')) {
             return null;
         }
 

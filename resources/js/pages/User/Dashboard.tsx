@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import {
     eachDayOfInterval,
     eachMonthOfInterval,
@@ -33,6 +33,7 @@ import {
     Cell,
 } from 'recharts';
 import TrackerLayout from '@/components/expense-tracker/layout';
+import { formatCurrencyAmount, resolveCurrencyCode } from '@/lib/utils';
 import expense from '@/routes/expense';
 import type {
     TrackerCategory,
@@ -45,13 +46,6 @@ import type {
 type DashboardPeriod = 'this-month' | 'last-month' | 'this-year';
 
 const CATEGORY_FALLBACK_COLOR = '#94a3b8';
-
-const formatCurrency = (amount: number, minimumFractionDigits = 2): string => {
-    return amount.toLocaleString('en-US', {
-        minimumFractionDigits,
-        maximumFractionDigits: minimumFractionDigits,
-    });
-};
 
 const calculateChange = (currentValue: number, previousValue: number): number | null => {
     if (previousValue === 0) {
@@ -74,6 +68,8 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ navigation, profile, data: pageData }: DashboardProps) {
+    const page = usePage<{ userPreferenceCurrency?: string }>();
+    const preferredCurrency = resolveCurrencyCode(page.props.userPreferenceCurrency);
     const [period, setPeriod] = useState<DashboardPeriod>('this-month');
 
     const categories = useMemo(
@@ -97,6 +93,11 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
     const walletMap = useMemo(
         () => new Map(wallets.map((wallet) => [wallet.id, wallet])),
         [wallets],
+    );
+
+    const displayCurrency = useMemo(
+        () => preferredCurrency ?? resolveCurrencyCode(wallets[0]?.currency),
+        [preferredCurrency, wallets],
     );
 
     const periodRange = useMemo(() => {
@@ -394,8 +395,7 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
                                     Tổng số dư
                                 </p>
                                 <h3 className="text-3xl font-bold text-slate-900">
-                                    $
-                                    {formatCurrency(totalBalance)}
+                                    {formatCurrencyAmount(totalBalance, displayCurrency)}
                                 </h3>
                             </div>
                             <div className="rounded-xl bg-primary-50 p-3 text-primary-600">
@@ -414,8 +414,7 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
                                     Tổng thu nhập
                                 </p>
                                 <h3 className="text-3xl font-bold text-slate-900">
-                                    $
-                                    {formatCurrency(totalIncome)}
+                                    {formatCurrencyAmount(totalIncome, displayCurrency)}
                                 </h3>
                             </div>
                             <div className="rounded-xl bg-success-50 p-3 text-success-600">
@@ -440,8 +439,7 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
                                     Tổng chi tiêu
                                 </p>
                                 <h3 className="text-3xl font-bold text-slate-900">
-                                    $
-                                    {formatCurrency(totalExpense)}
+                                    {formatCurrencyAmount(totalExpense, displayCurrency)}
                                 </h3>
                             </div>
                             <div className="rounded-xl bg-danger-50 p-3 text-danger-600">
@@ -514,7 +512,11 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
                                         tickLine={false}
                                         tick={{ fill: '#64748b', fontSize: 12 }}
                                         tickFormatter={(value: number) =>
-                                            `$${value}`
+                                            formatCurrencyAmount(
+                                                Number(value),
+                                                displayCurrency,
+                                                0,
+                                            )
                                         }
                                     />
                                     <Tooltip
@@ -576,7 +578,10 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
                                         }}
                                         itemStyle={{ fontWeight: 500 }}
                                         formatter={(value: number | string | undefined) => [
-                                            `$${formatCurrency(Number(value ?? 0))}`,
+                                            formatCurrencyAmount(
+                                                Number(value ?? 0),
+                                                displayCurrency,
+                                            ),
                                             'Số tiền',
                                         ]}
                                     />
@@ -584,8 +589,7 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
                             </ResponsiveContainer>
                             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
                                 <span className="text-2xl font-bold text-slate-900">
-                                    $
-                                    {formatCurrency(totalExpense, 0)}
+                                    {formatCurrencyAmount(totalExpense, displayCurrency, 0)}
                                 </span>
                                 <span className="text-xs font-medium tracking-wider text-slate-500 uppercase">
                                     Tổng
@@ -610,7 +614,7 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
                                         </span>
                                     </div>
                                     <span className="font-bold text-slate-900">
-                                        ${formatCurrency(category.value)}
+                                        {formatCurrencyAmount(category.value, displayCurrency)}
                                     </span>
                                 </div>
                             ))}
@@ -708,9 +712,10 @@ export default function Dashboard({ navigation, profile, data: pageData }: Dashb
                                                 <td
                                                     className={`px-6 py-4 text-right font-bold ${isIncome ? 'text-success-600' : 'text-slate-900'}`}
                                                 >
-                                                    {isIncome ? '+' : '-'}$
-                                                    {formatCurrency(
+                                                    {isIncome ? '+' : '-'}
+                                                    {formatCurrencyAmount(
                                                         tx.amount,
+                                                        resolveCurrencyCode(wallet?.currency) ?? displayCurrency,
                                                     )}
                                                 </td>
                                             </tr>

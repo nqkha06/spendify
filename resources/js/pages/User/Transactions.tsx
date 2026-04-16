@@ -1,4 +1,4 @@
-import { useForm } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import { format, parseISO } from 'date-fns';
 import {
     ArrowDownRight,
@@ -15,6 +15,7 @@ import {
     MOCK_CATEGORIES,
     MOCK_WALLETS,
 } from '@/lib/mock-data';
+import { formatCurrencyAmount, resolveCurrencyCode } from '@/lib/utils';
 import expense from '@/routes/expense';
 import type {
     TrackerCategory,
@@ -39,6 +40,8 @@ export default function Transactions({
     profile,
     data,
 }: TransactionsProps) {
+    const page = usePage<{ userPreferenceCurrency?: string }>();
+    const preferredCurrency = resolveCurrencyCode(page.props.userPreferenceCurrency);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>(
@@ -290,12 +293,10 @@ export default function Transactions({
                                             <td
                                                 className={`px-6 py-4 text-right font-bold ${isIncome ? 'text-success-600' : 'text-slate-900'}`}
                                             >
-                                                {isIncome ? '+' : '-'}$
-                                                {transaction.amount.toLocaleString(
-                                                    'en-US',
-                                                    {
-                                                        minimumFractionDigits: 2,
-                                                    },
+                                                {isIncome ? '+' : '-'}
+                                                {formatCurrencyAmount(
+                                                    transaction.amount,
+                                                    wallet?.currency ?? preferredCurrency,
                                                 )}
                                             </td>
                                         </tr>
@@ -378,7 +379,9 @@ export default function Transactions({
                                     <div className="relative">
                                         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                             <span className="text-sm text-slate-500">
-                                                $
+                                                {resolveCurrencyCode(
+                                                    walletOptions.find((wallet) => wallet.id === formData.wallet_id)?.currency,
+                                                ) ?? preferredCurrency ?? '---'}
                                             </span>
                                         </div>
                                         <input
@@ -393,7 +396,7 @@ export default function Transactions({
                                                 )
                                             }
                                             placeholder="0.00"
-                                            className="block w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-7 text-slate-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                                            className="block w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-14 text-slate-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                                         />
                                     </div>
                                     {errors.amount ? (

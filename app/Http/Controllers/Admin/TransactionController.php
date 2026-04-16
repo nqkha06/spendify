@@ -8,7 +8,7 @@ use App\Models\Category;
 use App\Models\ExpenseTransaction;
 use App\Models\User;
 use App\Models\UserWallet;
-use App\Services\ExpenseTransactionService;
+use App\Services\TransactionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -18,7 +18,7 @@ class TransactionController extends Controller
 {
     protected $service;
 
-    public function __construct(ExpenseTransactionService $service)
+    public function __construct(TransactionService $service)
     {
         $this->service = $service;
     }

@@ -1,9 +1,10 @@
-import { useForm } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import { Plus, Target, AlertCircle, X } from 'lucide-react';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import TrackerLayout from '@/components/expense-tracker/layout';
 import { MOCK_CATEGORIES } from '@/lib/mock-data';
+import { formatCurrencyAmount, resolveCurrencyCode } from '@/lib/utils';
 import expense from '@/routes/expense';
 import type {
     TrackerCategory,
@@ -22,6 +23,8 @@ interface BudgetsProps {
 }
 
 export default function Budgets({ navigation, profile, data }: BudgetsProps) {
+    const page = usePage<{ userPreferenceCurrency?: string }>();
+    const displayCurrency = resolveCurrencyCode(page.props.userPreferenceCurrency);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const categories =
         data?.categories && data.categories.length > 0
@@ -133,10 +136,10 @@ export default function Budgets({ navigation, profile, data }: BudgetsProps) {
                                         Tổng hạn mức
                                     </p>
                                     <p className="text-2xl font-bold text-slate-900">
-                                        $
-                                        {totalBudget.toLocaleString('en-US', {
-                                            minimumFractionDigits: 2,
-                                        })}
+                                        {formatCurrencyAmount(
+                                            totalBudget,
+                                            displayCurrency,
+                                        )}
                                     </p>
                                 </div>
                                 <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
@@ -144,10 +147,10 @@ export default function Budgets({ navigation, profile, data }: BudgetsProps) {
                                         Tổng đã chi
                                     </p>
                                     <p className="text-2xl font-bold text-slate-900">
-                                        $
-                                        {totalSpent.toLocaleString('en-US', {
-                                            minimumFractionDigits: 2,
-                                        })}
+                                        {formatCurrencyAmount(
+                                            totalSpent,
+                                            displayCurrency,
+                                        )}
                                     </p>
                                 </div>
                             </div>
@@ -161,12 +164,10 @@ export default function Budgets({ navigation, profile, data }: BudgetsProps) {
                                     <p className="text-primary-700/80 mt-1 text-sm">
                                         Bạn vẫn còn{' '}
                                         <strong>
-                                            $
-                                            {(
-                                                totalBudget - totalSpent
-                                            ).toLocaleString('en-US', {
-                                                minimumFractionDigits: 2,
-                                            })}
+                                            {formatCurrencyAmount(
+                                                totalBudget - totalSpent,
+                                                displayCurrency,
+                                            )}
                                         </strong>{' '}
                                         cho phần còn lại của tháng.
                                     </p>
@@ -223,15 +224,18 @@ export default function Budgets({ navigation, profile, data }: BudgetsProps) {
                                     </div>
                                     <div className="text-right">
                                         <p className="font-bold text-slate-900">
-                                            $
-                                            {budget.spent.toLocaleString(
-                                                'en-US',
+                                            {formatCurrencyAmount(
+                                                budget.spent,
+                                                displayCurrency,
+                                                0,
                                             )}
                                         </p>
                                         <p className="text-xs font-medium text-slate-500">
-                                            trên $
-                                            {budget.limit.toLocaleString(
-                                                'en-US',
+                                            trên{' '}
+                                            {formatCurrencyAmount(
+                                                budget.limit,
+                                                displayCurrency,
+                                                0,
                                             )}
                                         </p>
                                     </div>
@@ -251,10 +255,11 @@ export default function Budgets({ navigation, profile, data }: BudgetsProps) {
                                             {Math.round(percentage)}% đã dùng
                                         </span>
                                         <span className="text-slate-500">
-                                            $
-                                            {(
-                                                budget.limit - budget.spent
-                                            ).toLocaleString('en-US')}{' '}
+                                            {formatCurrencyAmount(
+                                                budget.limit - budget.spent,
+                                                displayCurrency,
+                                                0,
+                                            )}{' '}
                                             còn lại
                                         </span>
                                     </div>

@@ -1,16 +1,49 @@
 import { User, Bell, Shield, Palette, Globe, ChevronRight } from 'lucide-react';
+import { FormEventHandler } from 'react';
+import { useForm } from '@inertiajs/react';
 import TrackerLayout from '@/components/expense-tracker/layout';
 import type {
     TrackerNavigationItem,
     TrackerProfile,
 } from '@/types/expense-tracker';
 
+interface CurrencyOption {
+    code: string;
+    label: string;
+}
+
 interface SettingProps {
     navigation: TrackerNavigationItem[];
     profile?: TrackerProfile;
+    preferences?: {
+        currency?: string;
+    };
+    currencyOptions?: CurrencyOption[];
 }
 
-export default function Setting({ navigation, profile }: SettingProps) {
+export default function Setting({
+    navigation,
+    profile,
+    preferences,
+    currencyOptions,
+}: SettingProps) {
+    const options = currencyOptions ?? [];
+
+    const initialCurrency =
+        preferences?.currency ?? options[0]?.code ?? '';
+
+    const form = useForm({
+        currency: initialCurrency,
+    });
+
+    const submit: FormEventHandler<HTMLFormElement> = (event) => {
+        event.preventDefault();
+
+        form.patch('/user/settings/preferences', {
+            preserveScroll: true,
+        });
+    };
+
     return (
         <TrackerLayout
             title="Cài đặt"
@@ -58,7 +91,7 @@ export default function Setting({ navigation, profile }: SettingProps) {
                     </div>
 
                     {/* Content Area */}
-                    <div className="space-y-6 md:col-span-3">
+                    <form className="space-y-6 md:col-span-3" onSubmit={submit}>
                         <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
                             <h2 className="mb-6 text-lg font-bold text-slate-900">
                                 Thông tin hồ sơ
@@ -114,25 +147,58 @@ export default function Setting({ navigation, profile }: SettingProps) {
                                     <label className="mb-1 block text-sm font-medium text-slate-700">
                                         Tiền tệ
                                     </label>
-                                    <select className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-slate-900 shadow-sm transition-colors focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
-                                        <option>USD ($)</option>
-                                        <option>EUR (€)</option>
-                                        <option>GBP (£)</option>
-                                        <option>VND (₫)</option>
+                                    <select
+                                        value={form.data.currency}
+                                        onChange={(event) => {
+                                            form.setData(
+                                                'currency',
+                                                event.target.value,
+                                            );
+                                        }}
+                                        className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-slate-900 shadow-sm transition-colors focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                                    >
+                                        {options.length === 0 ? (
+                                            <option value="" disabled>
+                                                Chưa có lựa chọn tiền tệ
+                                            </option>
+                                        ) : null}
+                                        {options.map((option) => (
+                                            <option
+                                                key={option.code}
+                                                value={option.code}
+                                            >
+                                                {option.label}
+                                            </option>
+                                        ))}
                                     </select>
+                                    {form.errors.currency ? (
+                                        <p className="mt-1 text-sm text-rose-600">
+                                            {form.errors.currency}
+                                        </p>
+                                    ) : null}
                                 </div>
                             </div>
 
                             <div className="mt-8 flex justify-end gap-3 border-t border-slate-100 pt-6">
-                                <button className="rounded-xl border border-slate-200 bg-white px-4 py-2 font-medium text-slate-700 transition-colors hover:bg-slate-50">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        form.reset();
+                                    }}
+                                    className="rounded-xl border border-slate-200 bg-white px-4 py-2 font-medium text-slate-700 transition-colors hover:bg-slate-50"
+                                >
                                     Hủy
                                 </button>
-                                <button className="hover:bg-primary-700 rounded-xl bg-primary-600 px-6 py-2 font-medium text-white shadow-sm shadow-primary-500/30 transition-colors">
+                                <button
+                                    type="submit"
+                                    disabled={form.processing}
+                                    className="hover:bg-primary-700 rounded-xl bg-primary-600 px-6 py-2 font-medium text-white shadow-sm shadow-primary-500/30 transition-colors disabled:cursor-not-allowed disabled:opacity-70"
+                                >
                                     Lưu thay đổi
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </TrackerLayout>

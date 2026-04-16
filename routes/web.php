@@ -17,10 +17,11 @@ use App\Http\Controllers\User\CategoryListController;
 use App\Http\Controllers\User\ExpenseBudgetsController;
 use App\Http\Controllers\User\ExpenseDashboardController;
 use App\Http\Controllers\User\ExpenseHomeController;
-use App\Http\Controllers\User\ExpenseSettingsController;
 use App\Http\Controllers\User\ExpenseTransactionsController;
 use App\Http\Controllers\User\ExpenseWalletsController;
 use App\Http\Controllers\User\TransactionStoreController;
+use App\Http\Controllers\User\UserPreferenceController;
+use App\Http\Controllers\User\UserSettingsController;
 use App\Http\Controllers\User\WalletStoreController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
@@ -38,8 +39,12 @@ Route::prefix('user')->name('expense.')->group(function () {
     Route::post('/budgets', BudgetStoreController::class)->middleware('auth')->name('budgets.store');
     Route::get('/wallets', ExpenseWalletsController::class)->middleware('auth')->name('wallets');
     Route::post('/wallets', WalletStoreController::class)->middleware('auth')->name('wallets.store');
-    Route::get('/settings', ExpenseSettingsController::class)->name('settings');
     Route::get('/categories', CategoryListController::class)->name('categories.index');
+});
+
+Route::middleware('auth')->prefix('user')->name('user.')->group(function () {
+    Route::get('/settings', UserSettingsController::class)->name('settings');
+    Route::patch('/settings/preferences', UserPreferenceController::class)->name('settings.preferences.update');
 });
 
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {

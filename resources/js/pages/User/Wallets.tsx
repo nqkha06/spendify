@@ -1,4 +1,4 @@
-import { useForm } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import { format, parseISO } from 'date-fns';
 import {
     Plus,
@@ -12,6 +12,7 @@ import {
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import TrackerLayout from '@/components/expense-tracker/layout';
+import { formatCurrencyAmount, resolveCurrencyCode } from '@/lib/utils';
 import {
     MOCK_WALLETS,
     MOCK_TRANSACTIONS,
@@ -37,6 +38,8 @@ interface WalletsProps {
 }
 
 export default function Wallets({ navigation, profile, data }: WalletsProps) {
+    const page = usePage<{ userPreferenceCurrency?: string }>();
+    const preferredCurrency = resolveCurrencyCode(page.props.userPreferenceCurrency);
     const wallets = data?.wallets ?? MOCK_WALLETS;
     const categories = data?.categories ?? MOCK_CATEGORIES;
     const transactions = data?.transactions ?? MOCK_TRANSACTIONS;
@@ -58,7 +61,7 @@ export default function Wallets({ navigation, profile, data }: WalletsProps) {
         reset,
     } = useForm({
         name: '',
-        currency: 'VND',
+        currency: preferredCurrency ?? '',
         opening_balance: '0',
         is_default: false,
     });
@@ -178,10 +181,9 @@ export default function Wallets({ navigation, profile, data }: WalletsProps) {
                                         <h3
                                             className={`text-2xl font-bold ${isNegative ? 'text-danger-600' : 'text-slate-900'}`}
                                         >
-                                            $
-                                            {wallet.balance.toLocaleString(
-                                                'en-US',
-                                                { minimumFractionDigits: 2 },
+                                            {formatCurrencyAmount(
+                                                wallet.balance,
+                                                wallet.currency,
                                             )}
                                         </h3>
                                         <p className="mt-2 text-xs tracking-wider text-slate-400 uppercase">
@@ -248,10 +250,13 @@ export default function Wallets({ navigation, profile, data }: WalletsProps) {
                                                     event.target.value.toUpperCase(),
                                                 )
                                             }
-                                            placeholder="VND"
+                                            placeholder="Mã tiền tệ"
                                             maxLength={3}
                                             className="block w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                                         />
+                                        <p className="mt-1 text-xs text-slate-500">
+                                            Dùng mã ISO 4217 cho đơn vị tiền tệ.
+                                        </p>
                                         {errors.currency ? (
                                             <p className="mt-1 text-xs text-danger-600">
                                                 {errors.currency}
@@ -399,12 +404,10 @@ export default function Wallets({ navigation, profile, data }: WalletsProps) {
                                                 <td
                                                     className={`px-6 py-4 text-right font-bold ${isIncome ? 'text-success-600' : 'text-slate-900'}`}
                                                 >
-                                                    {isIncome ? '+' : '-'}$
-                                                    {tx.amount.toLocaleString(
-                                                        'en-US',
-                                                        {
-                                                            minimumFractionDigits: 2,
-                                                        },
+                                                    {isIncome ? '+' : '-'}
+                                                    {formatCurrencyAmount(
+                                                        tx.amount,
+                                                        selectedWallet?.currency,
                                                     )}
                                                 </td>
                                             </tr>

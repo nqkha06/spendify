@@ -16,7 +16,7 @@ use App\Repositories\Contracts\ExpenseTransactionRepositoryInterface as ExpenseT
     dateField: 'transacted_at',
     maxLimit: 100,
 )]
-class ExpenseTransactionService extends BaseService
+class TransactionService extends BaseService
 {
     protected $repository;
 
