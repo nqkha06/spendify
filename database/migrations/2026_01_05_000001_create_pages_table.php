@@ -15,7 +15,12 @@ return new class extends Migration
         Schema::create('pages', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('title')->nullable();
             $table->string('image')->nullable();
+            $table->longText('content')->nullable();
+            $table->string('meta_title')->nullable();
+            $table->text('meta_description')->nullable();
+            $table->text('meta_keywords')->nullable();
             $table->string('slug')->unique();
             $table->unsignedBigInteger('category_id')->nullable();
             $table->json('tags')->nullable();
