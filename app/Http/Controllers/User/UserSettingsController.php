@@ -16,6 +16,10 @@ class UserSettingsController extends Controller
         $user = request()->user();
 
         return Inertia::render('User/Setting', [
+            'userProfile' => [
+                'name' => $user?->name ?? '',
+                'email' => $user?->email ?? '',
+            ],
             'preferences' => [
                 'currency' => $user?->getMeta('currency', 'VND') ?? 'VND',
             ],

@@ -21,6 +21,7 @@ use App\Http\Controllers\User\ExpenseTransactionsController;
 use App\Http\Controllers\User\ExpenseWalletsController;
 use App\Http\Controllers\User\TransactionStoreController;
 use App\Http\Controllers\User\UserPreferenceController;
+use App\Http\Controllers\User\UserProfileController;
 use App\Http\Controllers\User\UserSettingsController;
 use App\Http\Controllers\User\WalletStoreController;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +45,7 @@ Route::prefix('user')->name('expense.')->group(function () {
 
 Route::middleware('auth')->prefix('user')->name('user.')->group(function () {
     Route::get('/settings', UserSettingsController::class)->name('settings');
+    Route::patch('/settings/profile', UserProfileController::class)->name('settings.profile.update');
     Route::patch('/settings/preferences', UserPreferenceController::class)->name('settings.preferences.update');
 });
 

@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import {
     ArrowLeftRight,
     ChevronUp,
@@ -8,10 +8,12 @@ import {
     Settings2,
     Wallet,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ComponentType, PropsWithChildren } from 'react';
 import TrackerFooter from '@/components/expense-tracker/footer';
 import TrackerHeader from '@/components/expense-tracker/header';
+import { Toaster } from '@/components/ui/sonner';
+import { toast } from 'sonner';
 import type {
     TrackerNavigationItem,
     TrackerProfile,
@@ -286,6 +288,35 @@ export default function TrackerLayout({
     profile,
     children,
 }: TrackerLayoutProps) {
+    const page = usePage<{ flash?: Record<string, string | null> }>();
+    const previousFlash = useRef<Record<string, string | null> | null>(null);
+
+    useEffect(() => {
+        const flash = page.props.flash ?? null;
+
+        if (JSON.stringify(flash) === JSON.stringify(previousFlash.current)) {
+            return;
+        }
+
+        previousFlash.current = flash;
+
+        if (flash?.success) {
+            toast.success(flash.success, { position: 'top-right' });
+        }
+
+        if (flash?.error) {
+            toast.error(flash.error, { position: 'top-right' });
+        }
+
+        if (flash?.info) {
+            toast.info(flash.info, { position: 'top-right' });
+        }
+
+        if (flash?.warning) {
+            toast.warning(flash.warning, { position: 'top-right' });
+        }
+    }, [page.props.flash]);
+
     return (
         <div className="min-h-screen bg-slate-50 text-slate-900">
             <Head title={title} />
@@ -319,6 +350,8 @@ export default function TrackerLayout({
                 navigation={navigation}
                 activePath={activePath}
             />
+
+            <Toaster />
         </div>
     );
 }

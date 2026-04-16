@@ -15,6 +15,10 @@ interface CurrencyOption {
 interface SettingProps {
     navigation: TrackerNavigationItem[];
     profile?: TrackerProfile;
+    userProfile?: {
+        name?: string;
+        email?: string;
+    };
     preferences?: {
         currency?: string;
     };
@@ -24,6 +28,7 @@ interface SettingProps {
 export default function Setting({
     navigation,
     profile,
+    userProfile,
     preferences,
     currencyOptions,
 }: SettingProps) {
@@ -32,14 +37,27 @@ export default function Setting({
     const initialCurrency =
         preferences?.currency ?? options[0]?.code ?? '';
 
-    const form = useForm({
+    const profileForm = useForm({
+        name: userProfile?.name ?? '',
+        email: userProfile?.email ?? '',
+    });
+
+    const preferenceForm = useForm({
         currency: initialCurrency,
     });
 
-    const submit: FormEventHandler<HTMLFormElement> = (event) => {
+    const submitProfile: FormEventHandler<HTMLFormElement> = (event) => {
         event.preventDefault();
 
-        form.patch('/user/settings/preferences', {
+        profileForm.patch('/user/settings/profile', {
+            preserveScroll: true,
+        });
+    };
+
+    const submitPreference: FormEventHandler<HTMLFormElement> = (event) => {
+        event.preventDefault();
+
+        preferenceForm.patch('/user/settings/preferences', {
             preserveScroll: true,
         });
     };
@@ -91,7 +109,7 @@ export default function Setting({
                     </div>
 
                     {/* Content Area */}
-                    <form className="space-y-6 md:col-span-3" onSubmit={submit}>
+                    <div className="space-y-6 md:col-span-3">
                         <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
                             <h2 className="mb-6 text-lg font-bold text-slate-900">
                                 Thông tin hồ sơ
@@ -112,45 +130,90 @@ export default function Setting({
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                            <form
+                                className="grid grid-cols-1 gap-6 sm:grid-cols-2"
+                                onSubmit={submitProfile}
+                            >
                                 <div>
                                     <label className="mb-1 block text-sm font-medium text-slate-700">
-                                        Tên
+                                        Họ và tên
                                     </label>
                                     <input
                                         type="text"
-                                        defaultValue="Nguyễn"
+                                        value={profileForm.data.name}
+                                        onChange={(event) => {
+                                            profileForm.setData(
+                                                'name',
+                                                event.target.value,
+                                            );
+                                        }}
                                         className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-slate-900 shadow-sm transition-colors focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                                     />
+                                    {profileForm.errors.name ? (
+                                        <p className="mt-1 text-sm text-rose-600">
+                                            {profileForm.errors.name}
+                                        </p>
+                                    ) : null}
                                 </div>
-                                <div>
-                                    <label className="mb-1 block text-sm font-medium text-slate-700">
-                                        Họ
-                                    </label>
-                                    <input
-                                        type="text"
-                                        defaultValue="Văn A"
-                                        className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-slate-900 shadow-sm transition-colors focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-                                    />
-                                </div>
-                                <div className="sm:col-span-2">
+                                <div className="sm:col-span-1">
                                     <label className="mb-1 block text-sm font-medium text-slate-700">
                                         Địa chỉ email
                                     </label>
                                     <input
                                         type="email"
-                                        defaultValue="nguyenvana@example.com"
+                                        value={profileForm.data.email}
+                                        onChange={(event) => {
+                                            profileForm.setData(
+                                                'email',
+                                                event.target.value,
+                                            );
+                                        }}
                                         className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-slate-900 shadow-sm transition-colors focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                                     />
+                                    {profileForm.errors.email ? (
+                                        <p className="mt-1 text-sm text-rose-600">
+                                            {profileForm.errors.email}
+                                        </p>
+                                    ) : null}
                                 </div>
+                                <div className="sm:col-span-2 flex justify-end gap-3 border-t border-slate-100 pt-6">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            profileForm.reset();
+                                        }}
+                                        className="rounded-xl border border-slate-200 bg-white px-4 py-2 font-medium text-slate-700 transition-colors hover:bg-slate-50"
+                                    >
+                                        Hủy
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={profileForm.processing}
+                                        className="hover:bg-primary-700 rounded-xl bg-primary-600 px-6 py-2 font-medium text-white shadow-sm shadow-primary-500/30 transition-colors disabled:cursor-not-allowed disabled:opacity-70"
+                                    >
+                                        Cập nhật hồ sơ
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <form
+                            className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm"
+                            onSubmit={submitPreference}
+                        >
+                            <h2 className="mb-6 text-lg font-bold text-slate-900">
+                                Tùy chọn tài chính
+                            </h2>
+
+                            <div className="grid grid-cols-1 gap-6">
                                 <div className="sm:col-span-2">
                                     <label className="mb-1 block text-sm font-medium text-slate-700">
                                         Tiền tệ
                                     </label>
                                     <select
-                                        value={form.data.currency}
+                                        value={preferenceForm.data.currency}
                                         onChange={(event) => {
-                                            form.setData(
+                                            preferenceForm.setData(
                                                 'currency',
                                                 event.target.value,
                                             );
@@ -171,9 +234,9 @@ export default function Setting({
                                             </option>
                                         ))}
                                     </select>
-                                    {form.errors.currency ? (
+                                    {preferenceForm.errors.currency ? (
                                         <p className="mt-1 text-sm text-rose-600">
-                                            {form.errors.currency}
+                                            {preferenceForm.errors.currency}
                                         </p>
                                     ) : null}
                                 </div>
@@ -183,7 +246,7 @@ export default function Setting({
                                 <button
                                     type="button"
                                     onClick={() => {
-                                        form.reset();
+                                        preferenceForm.reset();
                                     }}
                                     className="rounded-xl border border-slate-200 bg-white px-4 py-2 font-medium text-slate-700 transition-colors hover:bg-slate-50"
                                 >
@@ -191,14 +254,14 @@ export default function Setting({
                                 </button>
                                 <button
                                     type="submit"
-                                    disabled={form.processing}
+                                    disabled={preferenceForm.processing}
                                     className="hover:bg-primary-700 rounded-xl bg-primary-600 px-6 py-2 font-medium text-white shadow-sm shadow-primary-500/30 transition-colors disabled:cursor-not-allowed disabled:opacity-70"
                                 >
-                                    Lưu thay đổi
+                                    Lưu tiền tệ
                                 </button>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </TrackerLayout>
