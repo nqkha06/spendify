@@ -103,9 +103,9 @@ interface LayoutProps {
 
 export default function Layout({
     children,
-    title = 'Spendify - Quan ly chi tieu ca nhan',
+    title,
 }: LayoutProps) {
-    const { auth, publicMenus } = usePage().props as {
+    const { auth, publicMenus, appearanceOptions } = usePage().props as {
         auth?: {
             user?: unknown | null;
         };
@@ -113,10 +113,21 @@ export default function Layout({
             homeHeader?: PublicMenuItem[];
             homeFooter?: PublicMenuItem[];
         };
+        appearanceOptions?: {
+            logo_light?: string | null;
+            logo_dark?: string | null;
+            site_name?: string | null;
+            site_title?: string | null;
+            tagline?: string | null;
+        };
     };
     const isAuthenticated = Boolean(auth?.user);
     const headerMenus = publicMenus?.homeHeader?.length ? publicMenus.homeHeader : defaultHeaderMenus;
     const footerMenus = publicMenus?.homeFooter?.length ? publicMenus.homeFooter : defaultFooterMenus;
+    const brandName = appearanceOptions?.site_name?.trim() || 'Spendify';
+    const brandLogo = appearanceOptions?.logo_light || appearanceOptions?.logo_dark || '/logo.png';
+    const pageTitle = title || appearanceOptions?.site_title || `${brandName} - Quan ly chi tieu ca nhan`;
+    const tagline = appearanceOptions?.tagline?.trim() || 'Cách quản lý chi tiêu thông minh và nhẹ nhàng hơn mỗi ngày. Theo dõi thu chi rõ ràng, duy trì thói quen tài chính bền vững.';
 
     useEffect(() => {
         const backToTopBtn = document.getElementById('backToTop');
@@ -141,7 +152,7 @@ export default function Layout({
 
     return (
         <div className="bg-gray-50 text-slate-800 antialiased selection:bg-brand-500 selection:text-white min-h-screen flex flex-col font-sans">
-            <Head title={title}>
+            <Head title={pageTitle}>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -152,9 +163,9 @@ export default function Layout({
                 <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2">
                         <div className="w-10 h-10">
-                            <img className='w-full h-full object-cover rounded-xl shadow-sm' src="/logo.png" alt="Spendify Logo" />
+                            <img className='w-full h-full object-cover rounded-xl shadow-sm' src={brandLogo} alt={`${brandName} Logo`} />
                         </div>
-                        <span className="text-xl font-bold tracking-tight text-slate-900">Spendify</span>
+                        <span className="text-xl font-bold tracking-tight text-slate-900">{brandName}</span>
                     </Link>
 
                     <div className="hidden md:flex items-center gap-8 font-medium text-slate-600">
@@ -208,12 +219,12 @@ export default function Layout({
                         <div className="col-span-2">
                             <div className="flex items-center gap-2 mb-6">
                                 <div className="w-10 h-10">
-                                    <img className='w-full h-full object-cover rounded-xl shadow-sm' src="/logo.png" alt="Spendify Logo" />
+                                    <img className='w-full h-full object-cover rounded-xl shadow-sm' src={brandLogo} alt={`${brandName} Logo`} />
                                 </div>
-                                <span className="text-xl font-bold tracking-tight text-slate-900">Spendify</span>
+                                <span className="text-xl font-bold tracking-tight text-slate-900">{brandName}</span>
                             </div>
                             <p className="text-slate-500 text-sm leading-relaxed mb-6 max-w-sm">
-                                Cách quản lý chi tiêu thông minh và nhẹ nhàng hơn mỗi ngày. Theo dõi thu chi rõ ràng, duy trì thói quen tài chính bền vững.
+                                {tagline}
                             </p>
                             <div className="flex items-center gap-4">
                                 <a href="#" className="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-slate-600 hover:text-brand-500 hover:border-brand-500 transition-colors">
@@ -250,7 +261,7 @@ export default function Layout({
 
                     <div className="border-t border-gray-200 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
                         <p className="text-sm text-slate-500">
-                            &copy; 2026 Spendify. Đã đăng ký bản quyền.
+                            &copy; {new Date().getFullYear()} {brandName}. Đã đăng ký bản quyền.
                         </p>
                         <div className="flex items-center gap-4">
                             <div className="flex items-center gap-2 text-xs font-bold text-slate-400 bg-white px-3 py-1.5 rounded-lg border border-gray-200">

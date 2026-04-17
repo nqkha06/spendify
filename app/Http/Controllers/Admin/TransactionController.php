@@ -82,7 +82,7 @@ class TransactionController extends Controller
 
     public function store(ExpenseTransactionRequest $request): RedirectResponse
     {
-        ExpenseTransaction::query()->create($this->normalizePayload($request->validated()));
+        $this->service->create($this->normalizePayload($request->validated()));
 
         return redirect()
             ->route('admin.transactions.index')
@@ -110,7 +110,7 @@ class TransactionController extends Controller
 
     public function update(ExpenseTransactionRequest $request, ExpenseTransaction $transaction): RedirectResponse
     {
-        $transaction->update($this->normalizePayload($request->validated()));
+        $this->service->update($transaction->id, $this->normalizePayload($request->validated()));
 
         return redirect()
             ->route('admin.transactions.index')

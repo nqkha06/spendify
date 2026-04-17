@@ -77,7 +77,7 @@ class PageController extends Controller
     {
         $data = $request->validated();
 
-        $page = Page::query()->create([
+        $page = $this->service->create([
             'user_id' => $request->user()?->id,
             'title' => $data['title'],
             'image' => $data['image'] ?? null,
@@ -121,7 +121,7 @@ class PageController extends Controller
     {
         $data = $request->validated();
 
-        $page->update([
+        $page = $this->service->update($page->id, [
             'title' => $data['title'],
             'slug' => $this->resolveBaseSlug($data, $page),
             'image' => $data['image'] ?? null,

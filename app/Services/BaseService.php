@@ -73,14 +73,36 @@ abstract class BaseService
         return $record;
     }
 
-    public function save(Request $request, ?int $id = null)
+    public function create(array|Request $payload)
     {
         try {
             $result = $this->beginTransaction()
-                ->setRequest($request)
+                ->setRequest($this->normalizeRequest($payload))
                 ->prepareModel()
                 ->beforeSave()
-                ->saveModel($id)
+                ->saveModel()
+                ->saveRelations()
+                ->afterSave()
+                ->commit()
+                ->getResult();
+
+            return $result;
+        } catch (\Throwable $th) {
+            $this->rollBack();
+            Log::error($th->getMessage());
+
+            return false;
+        }
+    }
+
+    public function update(int|string $id, array|Request $payload)
+    {
+        try {
+            $result = $this->beginTransaction()
+                ->setRequest($this->normalizeRequest($payload))
+                ->prepareModel()
+                ->beforeSave()
+                ->saveModel((int) $id)
                 ->saveRelations()
                 ->afterSave()
                 ->commit()

@@ -81,11 +81,6 @@ const adminNavItems: NavItem[] = [
                 href: adminAppearance.index().url,
                 icon: Settings,
             },
-            {
-                title: 'Slider',
-                href: '#',
-                icon: Settings,
-            },
         ],
     },
     {

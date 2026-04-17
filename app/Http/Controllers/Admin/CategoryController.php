@@ -70,7 +70,7 @@ class CategoryController extends Controller
      */
     public function store(CategoryRequest $request): RedirectResponse
     {
-        Category::create($request->validated());
+        $this->service->create($request);
 
         return redirect()
             ->route('admin.categories.index')
@@ -97,7 +97,7 @@ class CategoryController extends Controller
      */
     public function update(CategoryRequest $request, Category $category): RedirectResponse
     {
-        $category->update($request->validated());
+        $this->service->update($category->id, $request);
 
         return redirect()
             ->route('admin.categories.index')

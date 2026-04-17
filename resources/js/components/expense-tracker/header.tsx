@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -54,17 +54,21 @@ export default function TrackerHeader({
     activePath,
     profile,
 }: TrackerHeaderProps) {
+    const page = usePage<any>();
     const homeLink = navigation[0]?.href ?? '/user';
+    const appearanceOptions = page.props?.appearanceOptions ?? {};
+    const brandName = appearanceOptions.site_name || 'Spendify';
+    const brandLogo = appearanceOptions.logo_light || appearanceOptions.logo_dark || '/logo.png';
 
     return (
         <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
             <div className="mx-auto flex h-18 w-full max-w-7xl items-center justify-between px-4 sm:px-6">
                 <Link href={homeLink} className="flex items-center gap-2">
                     <div className="w-9 h-9">
-                        <img className='w-full h-full object-cover rounded-xl shadow-sm' src="/logo.png" alt="Spendify Logo" />
+                        <img className='w-full h-full object-cover rounded-xl shadow-sm' src={brandLogo} alt={`${brandName} Logo`} />
                     </div>
                     <span className="text-lg font-semibold tracking-tight text-slate-900">
-                        Spendify
+                        {brandName}
                     </span>
                 </Link>
 

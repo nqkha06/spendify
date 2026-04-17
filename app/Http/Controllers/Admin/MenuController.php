@@ -90,7 +90,7 @@ class MenuController extends Controller
      */
     public function store(MenuRequest $request): RedirectResponse
     {
-        Menu::query()->create($this->normalizePayload($request->validated()));
+        $this->service->create($this->normalizePayload($request->validated()));
 
         return redirect()
             ->route('admin.menus.index')
@@ -130,7 +130,7 @@ class MenuController extends Controller
      */
     public function update(MenuRequest $request, Menu $menu): RedirectResponse
     {
-        $menu->update($this->normalizePayload($request->validated()));
+        $this->service->update($menu->id, $this->normalizePayload($request->validated()));
 
         return redirect()
             ->route('admin.menus.index')

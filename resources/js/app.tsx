@@ -5,10 +5,14 @@ import { createRoot } from 'react-dom/client';
 import '../css/app.css';
 import { initializeTheme } from '@/hooks/use-appearance';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const fallbackAppName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
-    title: (title) => (title ? `${title} - ${appName}` : appName),
+    title: (title, page) => {
+        const siteTitle = (page as any)?.props?.appearanceOptions?.site_title || fallbackAppName;
+
+        return title ? `${title} - ${siteTitle}` : siteTitle;
+    },
     resolve: (name) =>
         resolvePageComponent(
             `./pages/${name}.tsx`,

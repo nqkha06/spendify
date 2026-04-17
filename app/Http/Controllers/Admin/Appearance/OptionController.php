@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin\Appearance;
 
 use App\Http\Controllers\Controller;
-use App\Models\Language;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -15,14 +14,18 @@ use Inertia\Response as InertiaResponse;
 class OptionController extends Controller
 {
     private const KEY_LOGO_LIGHT = 'appearance.logo_light';
+
     private const KEY_LOGO_DARK = 'appearance.logo_dark';
+
     private const KEY_FAVICON = 'appearance.favicon';
+
     private const KEY_SOCIAL_IMAGE = 'appearance.social_image';
+
     private const KEY_GENERAL = 'appearance.general';
 
-    public function edit(Request $request): InertiaResponse
+    public function index(Request $request): InertiaResponse
     {
-        $languages = Language::query()->orderBy('order')->get(['id', 'name', 'code', 'locale', 'is_default']);
+        $languages = $this->languages();
 
         $logos = [
             'logo_light' => $this->getSetting(self::KEY_LOGO_LIGHT),
@@ -33,26 +36,25 @@ class OptionController extends Controller
 
         $general = $this->getJsonSetting(self::KEY_GENERAL, []);
 
-        return Inertia::render('admin/settings/appearance/options', [
+        return Inertia::render('Admin/settings/appearance/options', [
             'languages' => $languages,
             'logos' => $this->withUrls($logos),
             'general' => $general,
         ]);
     }
 
-    public function update(Request $request)
+    public function store(Request $request)
     {
-        $languages = Language::query()->orderBy('order')->get(['id', 'name', 'code', 'locale', 'is_default']);
-        $languageCodes = $languages->pluck('code')->all();
+        $languageCodes = collect($this->languages())->pluck('code')->all();
 
         $imageMimes = 'jpg,jpeg,png,gif,webp,svg,ico';
         $imageMimeTypes = 'image/jpeg,image/png,image/gif,image/webp,image/svg+xml,image/x-icon,image/vnd.microsoft.icon';
 
         $rules = [
-            'logo_light' => ['nullable', 'mimes:' . $imageMimes, 'mimetypes:' . $imageMimeTypes, 'max:4096'],
-            'logo_dark' => ['nullable', 'mimes:' . $imageMimes, 'mimetypes:' . $imageMimeTypes, 'max:4096'],
-            'favicon' => ['nullable', 'mimes:' . $imageMimes, 'mimetypes:' . $imageMimeTypes, 'max:4096'],
-            'social_image' => ['nullable', 'mimes:' . $imageMimes, 'mimetypes:' . $imageMimeTypes, 'max:4096'],
+            'logo_light' => ['nullable', 'mimes:'.$imageMimes, 'mimetypes:'.$imageMimeTypes, 'max:4096'],
+            'logo_dark' => ['nullable', 'mimes:'.$imageMimes, 'mimetypes:'.$imageMimeTypes, 'max:4096'],
+            'favicon' => ['nullable', 'mimes:'.$imageMimes, 'mimetypes:'.$imageMimeTypes, 'max:4096'],
+            'social_image' => ['nullable', 'mimes:'.$imageMimes, 'mimetypes:'.$imageMimeTypes, 'max:4096'],
             'general' => ['nullable', 'array'],
         ];
 
@@ -105,25 +107,50 @@ class OptionController extends Controller
         return Redirect::back()->with('success', 'Appearance settings updated');
     }
 
+    /**
+     * @return array<int, array{id: int, name: string, code: string, locale: string, is_default: bool}>
+     */
+    private function languages(): array
+    {
+        $supportedLocales = config('app.supported_locales', ['vi', 'en']);
+        $defaultLocale = (string) config('app.locale', 'vi');
+
+        return collect($supportedLocales)
+            ->filter(fn ($code): bool => is_string($code) && trim($code) !== '')
+            ->values()
+            ->map(function (string $code, int $index) use ($defaultLocale): array {
+                $normalizedCode = strtolower($code);
+
+                return [
+                    'id' => $index + 1,
+                    'name' => strtoupper($normalizedCode),
+                    'code' => $normalizedCode,
+                    'locale' => $normalizedCode,
+                    'is_default' => $normalizedCode === $defaultLocale,
+                ];
+            })
+            ->all();
+    }
+
     private function handleUpload(Request $request, string $field, ?string $current): ?string
     {
-        if (!$request->hasFile($field)) {
+        if (! $request->hasFile($field)) {
             return $current;
         }
 
         $file = $request->file($field);
         $dir = public_path('settings');
-        if (!is_dir($dir)) {
+        if (! is_dir($dir)) {
             mkdir($dir, 0755, true);
         }
 
         $name = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
         $ext = $file->getClientOriginalExtension();
-        $filename = $name ? $name . '-' . Str::random(8) . '.' . $ext : Str::random(12) . '.' . $ext;
+        $filename = $name ? $name.'-'.Str::random(8).'.'.$ext : Str::random(12).'.'.$ext;
 
         $file->move($dir, $filename);
 
-        return 'settings/' . $filename; // relative to public/
+        return 'settings/'.$filename;
     }
 
     private function getSetting(string $key, $default = null)
@@ -135,7 +162,7 @@ class OptionController extends Controller
     {
         $raw = $this->getSetting($key);
 
-        if (!$raw) {
+        if (! $raw) {
             return $default;
         }
 
@@ -162,7 +189,7 @@ class OptionController extends Controller
 
     private function toUrl(?string $path): ?string
     {
-        if (!$path) {
+        if (! $path) {
             return null;
         }
 

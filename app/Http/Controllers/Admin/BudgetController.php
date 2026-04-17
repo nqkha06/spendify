@@ -78,7 +78,7 @@ class BudgetController extends Controller
 
     public function store(BudgetRequest $request): RedirectResponse
     {
-        Budget::query()->create($this->normalizePayload($request->validated()));
+        $this->service->create($this->normalizePayload($request->validated()));
 
         return redirect()
             ->route('admin.budgets.index')
@@ -107,7 +107,7 @@ class BudgetController extends Controller
 
     public function update(BudgetRequest $request, Budget $budget): RedirectResponse
     {
-        $budget->update($this->normalizePayload($request->validated()));
+        $this->service->update($budget->id, $this->normalizePayload($request->validated()));
 
         return redirect()
             ->route('admin.budgets.index')
