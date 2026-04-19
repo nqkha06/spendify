@@ -7,23 +7,19 @@ use App\Models\Category;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class ExpenseDashboardController extends Controller
+class TransactionsController extends Controller
 {
     public function __invoke(): Response
     {
         $user = request()->user();
-
         $wallets = $user?->wallets()
             ->orderByDesc('is_default')
             ->orderBy('name')
-            ->get()
+            ->get(['id', 'name', 'currency'])
             ->map(fn ($wallet): array => [
                 'id' => (string) $wallet->id,
                 'name' => $wallet->name,
-                'balance' => (float) $wallet->opening_balance,
-                'type' => 'cash',
                 'currency' => $wallet->currency,
-                'isDefault' => (bool) $wallet->is_default,
             ])
             ->values()
             ->all() ?? [];
@@ -41,6 +37,10 @@ class ExpenseDashboardController extends Controller
             ->all();
 
         $transactions = $user?->expenseTransactions()
+            ->with([
+                'wallet:id,name,currency',
+                'category:id,name,color',
+            ])
             ->latest('transacted_at')
             ->latest('id')
             ->get()
@@ -58,7 +58,7 @@ class ExpenseDashboardController extends Controller
             ->values()
             ->all() ?? [];
 
-        return Inertia::render('User/Dashboard', [
+        return Inertia::render('User/Transactions', [
             'data' => [
                 'categories' => $categories,
                 'wallets' => $wallets,

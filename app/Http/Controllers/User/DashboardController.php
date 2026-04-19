@@ -7,7 +7,7 @@ use App\Models\Category;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class ExpenseWalletsController extends Controller
+class DashboardController extends Controller
 {
     public function __invoke(): Response
     {
@@ -58,7 +58,7 @@ class ExpenseWalletsController extends Controller
             ->values()
             ->all() ?? [];
 
-        return Inertia::render('User/Wallets', [
+        return Inertia::render('User/Dashboard', [
             'data' => [
                 'categories' => $categories,
                 'wallets' => $wallets,

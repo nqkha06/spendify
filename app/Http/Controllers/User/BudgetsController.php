@@ -9,7 +9,7 @@ use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class ExpenseBudgetsController extends Controller
+class BudgetsController extends Controller
 {
     public function __invoke(): Response
     {

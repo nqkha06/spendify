@@ -6,7 +6,6 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PermissionController;
-use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\Settings\LanguageController;
 use App\Http\Controllers\Admin\SlideController;
@@ -15,11 +14,11 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\PublicPageShowController;
 use App\Http\Controllers\User\BudgetStoreController;
 use App\Http\Controllers\User\CategoryListController;
-use App\Http\Controllers\User\ExpenseBudgetsController;
-use App\Http\Controllers\User\ExpenseDashboardController;
-use App\Http\Controllers\User\ExpenseHomeController;
-use App\Http\Controllers\User\ExpenseTransactionsController;
-use App\Http\Controllers\User\ExpenseWalletsController;
+use App\Http\Controllers\User\BudgetsController;
+use App\Http\Controllers\User\DashboardController;
+use App\Http\Controllers\User\HomeController;
+use App\Http\Controllers\User\TransactionsController;
+use App\Http\Controllers\User\WalletsController;
 use App\Http\Controllers\User\TransactionStoreController;
 use App\Http\Controllers\User\UserPreferenceController;
 use App\Http\Controllers\User\UserProfileController;
@@ -37,13 +36,13 @@ Route::get('/p/{slug}', PublicPageShowController::class)
     ->name('pages.show');
 
 Route::prefix('user')->name('expense.')->group(function () {
-    Route::get('/', ExpenseHomeController::class)->name('home');
-    Route::get('/dashboard', ExpenseDashboardController::class)->name('dashboard');
-    Route::get('/transactions', ExpenseTransactionsController::class)->name('transactions');
+    Route::get('/', HomeController::class)->name('home');
+    Route::get('/dashboard', DashboardController::class)->name('dashboard');
+    Route::get('/transactions', TransactionsController::class)->name('transactions');
     Route::post('/transactions', TransactionStoreController::class)->middleware('auth')->name('transactions.store');
-    Route::get('/budgets', ExpenseBudgetsController::class)->name('budgets');
+    Route::get('/budgets', BudgetsController::class)->name('budgets');
     Route::post('/budgets', BudgetStoreController::class)->middleware('auth')->name('budgets.store');
-    Route::get('/wallets', ExpenseWalletsController::class)->middleware('auth')->name('wallets');
+    Route::get('/wallets', WalletsController::class)->middleware('auth')->name('wallets');
     Route::post('/wallets', WalletStoreController::class)->middleware('auth')->name('wallets.store');
     Route::get('/categories', CategoryListController::class)->name('categories.index');
 });
@@ -63,8 +62,6 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::resource('transactions', TransactionController::class);
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
-    Route::resource('posts', PostController::class);
-    Route::resource('slides', SlideController::class);
 
     Route::prefix('settings')->name('settings.')->group(function () {
         Route::resource('languages', LanguageController::class);

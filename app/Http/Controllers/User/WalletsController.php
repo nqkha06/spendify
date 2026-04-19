@@ -7,19 +7,23 @@ use App\Models\Category;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class ExpenseTransactionsController extends Controller
+class WalletsController extends Controller
 {
     public function __invoke(): Response
     {
         $user = request()->user();
+
         $wallets = $user?->wallets()
             ->orderByDesc('is_default')
             ->orderBy('name')
-            ->get(['id', 'name', 'currency'])
+            ->get()
             ->map(fn ($wallet): array => [
                 'id' => (string) $wallet->id,
                 'name' => $wallet->name,
+                'balance' => (float) $wallet->opening_balance,
+                'type' => 'cash',
                 'currency' => $wallet->currency,
+                'isDefault' => (bool) $wallet->is_default,
             ])
             ->values()
             ->all() ?? [];
@@ -37,10 +41,6 @@ class ExpenseTransactionsController extends Controller
             ->all();
 
         $transactions = $user?->expenseTransactions()
-            ->with([
-                'wallet:id,name,currency',
-                'category:id,name,color',
-            ])
             ->latest('transacted_at')
             ->latest('id')
             ->get()
@@ -58,7 +58,7 @@ class ExpenseTransactionsController extends Controller
             ->values()
             ->all() ?? [];
 
-        return Inertia::render('User/Transactions', [
+        return Inertia::render('User/Wallets', [
             'data' => [
                 'categories' => $categories,
                 'wallets' => $wallets,
