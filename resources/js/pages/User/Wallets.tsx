@@ -7,16 +7,13 @@ import {
     CreditCard,
     ArrowDownRight,
     DollarSign,
-    MoreVertical,
+    Pencil,
+    Trash2,
+    X,
 } from 'lucide-react';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import TrackerLayout from '@/components/expense-tracker/layout';
-import {
-    MOCK_WALLETS,
-    MOCK_TRANSACTIONS,
-    MOCK_CATEGORIES,
-} from '@/lib/mock-data';
 import { formatCurrencyAmount, resolveCurrencyCode } from '@/lib/utils';
 import expense from '@/routes/expense';
 import type {
@@ -39,26 +36,34 @@ interface WalletsProps {
 
 export default function Wallets({ navigation, profile, data }: WalletsProps) {
     const page = usePage<{ userPreferenceCurrency?: string }>();
-    const preferredCurrency = resolveCurrencyCode(page.props.userPreferenceCurrency);
-    const wallets = data?.wallets ?? MOCK_WALLETS;
-    const categories = data?.categories ?? MOCK_CATEGORIES;
-    const transactions = data?.transactions ?? MOCK_TRANSACTIONS;
+    const preferredCurrency = resolveCurrencyCode(
+        page.props.userPreferenceCurrency,
+    );
+    const wallets = data?.wallets || [];
+    const categories = data?.categories || [];
+    const transactions = data?.transactions || [];
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingWallet, setEditingWallet] = useState<TrackerWallet | null>(
+        null,
+    );
     const [selectedWalletId, setSelectedWalletId] = useState<string>(
         wallets[0]?.id ?? '',
     );
-    const selectedWallet = wallets.find(
-        (wallet) => wallet.id === selectedWalletId,
-    );
+    const selectedWallet =
+        wallets.find((wallet) => wallet.id === selectedWalletId) ?? wallets[0];
+    const activeWalletId = selectedWallet?.id ?? '';
 
     const {
         data: formData,
         setData,
         post,
+        put,
+        delete: destroy,
         processing,
         errors,
         reset,
+        clearErrors,
     } = useForm({
         name: '',
         currency: preferredCurrency ?? '',
@@ -66,19 +71,62 @@ export default function Wallets({ navigation, profile, data }: WalletsProps) {
         is_default: false,
     });
 
+    const openCreateModal = () => {
+        setEditingWallet(null);
+        clearErrors();
+        setData({
+            name: '',
+            currency: preferredCurrency ?? '',
+            opening_balance: '0',
+            is_default: false,
+        });
+        setIsModalOpen(true);
+    };
+
+    const openEditModal = (wallet: TrackerWallet) => {
+        setEditingWallet(wallet);
+        clearErrors();
+        setData({
+            name: wallet.name,
+            currency: wallet.currency ?? preferredCurrency ?? '',
+            opening_balance: String(wallet.balance),
+            is_default: Boolean(wallet.isDefault),
+        });
+        setIsModalOpen(true);
+    };
+
     const closeModal = () => {
         setIsModalOpen(false);
+        setEditingWallet(null);
+        clearErrors();
         reset();
     };
 
     const submitWallet = (event: FormEvent) => {
         event.preventDefault();
 
-        post(expense.wallets().url, {
+        const options = {
             preserveScroll: true,
             onSuccess: () => {
                 closeModal();
             },
+        };
+
+        if (editingWallet) {
+            put(expense.wallets.update(Number(editingWallet.id)).url, options);
+            return;
+        }
+
+        post(expense.wallets.store().url, options);
+    };
+
+    const deleteWallet = (wallet: TrackerWallet) => {
+        if (!window.confirm(`Xoá ví "${wallet.name}"?`)) {
+            return;
+        }
+
+        destroy(expense.wallets.destroy(Number(wallet.id)).url, {
+            preserveScroll: true,
         });
     };
 
@@ -105,7 +153,7 @@ export default function Wallets({ navigation, profile, data }: WalletsProps) {
     };
 
     const walletTransactions = transactions
-        .filter((tx) => tx.walletId === selectedWalletId)
+        .filter((tx) => tx.walletId === activeWalletId)
         .sort(
             (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
         );
@@ -121,7 +169,7 @@ export default function Wallets({ navigation, profile, data }: WalletsProps) {
             action={
                 <button
                     type="button"
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={openCreateModal}
                     className="hover:bg-primary-700 flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 font-medium text-white shadow-sm shadow-primary-500/30 transition-colors"
                 >
                     <Plus className="h-4 w-4" />
@@ -142,7 +190,7 @@ export default function Wallets({ navigation, profile, data }: WalletsProps) {
                         </div>
                     ) : (
                         wallets.map((wallet) => {
-                            const isSelected = wallet.id === selectedWalletId;
+                            const isSelected = wallet.id === activeWalletId;
                             const isNegative = wallet.balance < 0;
                             return (
                                 <div
@@ -166,12 +214,31 @@ export default function Wallets({ navigation, profile, data }: WalletsProps) {
                                         >
                                             {getWalletIcon(wallet.type)}
                                         </div>
-                                        <button
-                                            className="p-1 text-slate-400 transition-colors hover:text-slate-600"
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            <MoreVertical className="h-5 w-5" />
-                                        </button>
+                                        <div className="flex items-center gap-1">
+                                            <button
+                                                type="button"
+                                                aria-label={`Sửa ${wallet.name}`}
+                                                className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-primary-600"
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    openEditModal(wallet);
+                                                }}
+                                            >
+                                                <Pencil className="h-4 w-4" />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                aria-label={`Xoá ${wallet.name}`}
+                                                disabled={processing}
+                                                className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-danger-50 hover:text-danger-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    deleteWallet(wallet);
+                                                }}
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </button>
+                                        </div>
                                     </div>
 
                                     <div>
@@ -201,14 +268,14 @@ export default function Wallets({ navigation, profile, data }: WalletsProps) {
                         <div className="w-full max-w-lg animate-in overflow-hidden rounded-2xl bg-white shadow-xl duration-300 slide-in-from-bottom-4">
                             <div className="flex items-center justify-between border-b border-slate-100 p-5">
                                 <h2 className="text-xl font-bold text-slate-900">
-                                    Thêm ví
+                                    {editingWallet ? 'Sửa ví' : 'Thêm ví'}
                                 </h2>
                                 <button
                                     type="button"
                                     onClick={closeModal}
                                     className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
                                 >
-                                    <MoreVertical className="h-5 w-5 rotate-90" />
+                                    <X className="h-5 w-5" />
                                 </button>
                             </div>
 
@@ -316,7 +383,11 @@ export default function Wallets({ navigation, profile, data }: WalletsProps) {
                                         disabled={processing}
                                         className="hover:bg-primary-700 rounded-xl bg-primary-600 px-5 py-2 text-sm font-medium text-white shadow-sm shadow-primary-500/30 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                                     >
-                                        {processing ? 'Đang lưu...' : 'Lưu ví'}
+                                        {processing
+                                            ? 'Đang lưu...'
+                                            : editingWallet
+                                              ? 'Cập nhật ví'
+                                              : 'Lưu ví'}
                                     </button>
                                 </div>
                             </form>

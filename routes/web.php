@@ -8,22 +8,20 @@ use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\Settings\LanguageController;
-use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\PublicPageShowController;
+use App\Http\Controllers\User\BudgetsController;
 use App\Http\Controllers\User\BudgetStoreController;
 use App\Http\Controllers\User\CategoryListController;
-use App\Http\Controllers\User\BudgetsController;
 use App\Http\Controllers\User\DashboardController;
 use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\TransactionsController;
-use App\Http\Controllers\User\WalletsController;
 use App\Http\Controllers\User\TransactionStoreController;
 use App\Http\Controllers\User\UserPreferenceController;
 use App\Http\Controllers\User\UserProfileController;
 use App\Http\Controllers\User\UserSettingsController;
-use App\Http\Controllers\User\WalletStoreController;
+use App\Http\Controllers\User\WalletsController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -42,8 +40,10 @@ Route::prefix('user')->name('expense.')->group(function () {
     Route::post('/transactions', TransactionStoreController::class)->middleware('auth')->name('transactions.store');
     Route::get('/budgets', BudgetsController::class)->name('budgets');
     Route::post('/budgets', BudgetStoreController::class)->middleware('auth')->name('budgets.store');
-    Route::get('/wallets', WalletsController::class)->middleware('auth')->name('wallets');
-    Route::post('/wallets', WalletStoreController::class)->middleware('auth')->name('wallets.store');
+    Route::get('/wallets', [WalletsController::class, 'index'])->middleware('auth')->name('wallets');
+    Route::post('/wallets', [WalletsController::class, 'store'])->middleware('auth')->name('wallets.store');
+    Route::put('/wallets/{wallet}', [WalletsController::class, 'update'])->middleware('auth')->name('wallets.update');
+    Route::delete('/wallets/{wallet}', [WalletsController::class, 'destroy'])->middleware('auth')->name('wallets.destroy');
     Route::get('/categories', CategoryListController::class)->name('categories.index');
 });
 

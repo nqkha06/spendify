@@ -3,15 +3,20 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\User\StoreWalletRequest;
+use App\Http\Requests\User\UpdateWalletRequest;
 use App\Models\Category;
+use App\Models\UserWallet;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class WalletsController extends Controller
 {
-    public function __invoke(): Response
+    public function index(Request $request): Response
     {
-        $user = request()->user();
+        $user = $request->user();
 
         $wallets = $user?->wallets()
             ->orderByDesc('is_default')
@@ -65,5 +70,81 @@ class WalletsController extends Controller
                 'transactions' => $transactions,
             ],
         ]);
+    }
+
+    public function store(StoreWalletRequest $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        $data = $request->validated();
+        $isDefault = (bool) ($data['is_default'] ?? false);
+
+        if ($user->wallets()->doesntExist()) {
+            $isDefault = true;
+        }
+
+        if ($isDefault) {
+            $user->wallets()->update(['is_default' => false]);
+        }
+
+        $user->wallets()->create([
+            'name' => $data['name'],
+            'currency' => strtoupper($data['currency']),
+            'opening_balance' => (float) ($data['opening_balance'] ?? 0),
+            'is_default' => $isDefault,
+        ]);
+
+        return redirect()->route('expense.wallets')
+            ->with('success', 'Wallet created successfully.');
+    }
+
+    public function update(UpdateWalletRequest $request, UserWallet $wallet): RedirectResponse
+    {
+        $user = $request->user();
+        $data = $request->validated();
+        $isDefault = (bool) ($data['is_default'] ?? false);
+
+        if ($isDefault) {
+            $user->wallets()
+                ->whereKeyNot($wallet->id)
+                ->update(['is_default' => false]);
+        }
+
+        if (! $isDefault && $wallet->is_default) {
+            $isDefault = $user->wallets()
+                ->whereKeyNot($wallet->id)
+                ->where('is_default', true)
+                ->doesntExist();
+        }
+
+        $wallet->update([
+            'name' => $data['name'],
+            'currency' => strtoupper($data['currency']),
+            'opening_balance' => (float) ($data['opening_balance'] ?? 0),
+            'is_default' => $isDefault,
+        ]);
+
+        return redirect()->route('expense.wallets')
+            ->with('success', 'Wallet updated successfully.');
+    }
+
+    public function destroy(Request $request, UserWallet $wallet): RedirectResponse
+    {
+        abort_unless($request->user()?->id === $wallet->user_id, 403);
+
+        $wasDefault = $wallet->is_default;
+
+        $wallet->delete();
+
+        if ($wasDefault) {
+            $request->user()
+                ->wallets()
+                ->oldest('id')
+                ->first()
+                ?->update(['is_default' => true]);
+        }
+
+        return redirect()->route('expense.wallets')
+            ->with('success', 'Wallet deleted successfully.');
     }
 }
