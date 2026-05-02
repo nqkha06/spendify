@@ -89,7 +89,7 @@ export default function Wallets({ navigation, profile, data }: WalletsProps) {
         setData({
             name: wallet.name,
             currency: wallet.currency ?? preferredCurrency ?? '',
-            opening_balance: String(wallet.balance),
+            opening_balance: String(wallet.openingBalance ?? wallet.balance),
             is_default: Boolean(wallet.isDefault),
         });
         setIsModalOpen(true);

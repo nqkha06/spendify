@@ -19,6 +19,7 @@ export interface TrackerWallet {
     id: string;
     name: string;
     balance: number;
+    openingBalance?: number;
     type: 'cash' | 'bank' | 'credit';
     currency?: string;
     isDefault?: boolean;

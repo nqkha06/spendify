@@ -1,7 +1,9 @@
 <?php
 
+use App\Models\ExpenseTransaction;
 use App\Models\User;
 use App\Models\UserWallet;
+use Inertia\Testing\AssertableInertia as Assert;
 
 test('user can update their wallet', function () {
     $user = User::factory()->create();
@@ -77,4 +79,66 @@ test('user cannot delete another users wallet', function () {
     $this->actingAs($user)
         ->delete(route('expense.wallets.destroy', $wallet))
         ->assertForbidden();
+});
+
+test('wallet balance includes posted transactions only', function () {
+    $user = User::factory()->create();
+    $wallet = UserWallet::factory()->create([
+        'user_id' => $user->id,
+        'opening_balance' => 1000,
+    ]);
+
+    ExpenseTransaction::factory()->create([
+        'user_id' => $user->id,
+        'wallet_id' => $wallet->id,
+        'type' => 'income',
+        'amount' => 500,
+        'status' => 'posted',
+    ]);
+    ExpenseTransaction::factory()->create([
+        'user_id' => $user->id,
+        'wallet_id' => $wallet->id,
+        'type' => 'expense',
+        'amount' => 250,
+        'status' => 'posted',
+    ]);
+    ExpenseTransaction::factory()->create([
+        'user_id' => $user->id,
+        'wallet_id' => $wallet->id,
+        'type' => 'income',
+        'amount' => 999,
+        'status' => 'pending',
+    ]);
+
+    $walletWithTotals = UserWallet::query()
+        ->withPostedTransactionTotals()
+        ->findOrFail($wallet->id);
+
+    expect($walletWithTotals->currentBalance())->toBe(1250.0);
+});
+
+test('dashboard returns calculated wallet balances', function () {
+    $user = User::factory()->create();
+    $wallet = UserWallet::factory()->defaultWallet()->create([
+        'user_id' => $user->id,
+        'name' => 'Main wallet',
+        'opening_balance' => 1000,
+    ]);
+
+    ExpenseTransaction::factory()->create([
+        'user_id' => $user->id,
+        'wallet_id' => $wallet->id,
+        'type' => 'expense',
+        'amount' => 300,
+        'status' => 'posted',
+    ]);
+
+    $this->actingAs($user)
+        ->withoutVite()
+        ->get(route('expense.dashboard'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('User/Dashboard')
+            ->where('data.wallets.0.balance', 700)
+        );
 });

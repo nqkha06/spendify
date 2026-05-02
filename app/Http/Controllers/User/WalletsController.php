@@ -19,13 +19,15 @@ class WalletsController extends Controller
         $user = $request->user();
 
         $wallets = $user?->wallets()
+            ->withPostedTransactionTotals()
             ->orderByDesc('is_default')
             ->orderBy('name')
             ->get()
             ->map(fn ($wallet): array => [
                 'id' => (string) $wallet->id,
                 'name' => $wallet->name,
-                'balance' => (float) $wallet->opening_balance,
+                'balance' => $wallet->currentBalance(),
+                'openingBalance' => (float) $wallet->opening_balance,
                 'type' => 'cash',
                 'currency' => $wallet->currency,
                 'isDefault' => (bool) $wallet->is_default,
