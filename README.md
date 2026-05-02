@@ -95,9 +95,7 @@ Nếu bạn không thấy thay đổi frontend, hãy đảm bảo `npm run dev` 
 
 ### Production live demo
 
-- Trang chủ: coming soon...
-- User: coming soon...
-- Admin: coming soon...
+- Demo: https://spendify.qkha.dev/
 
 ## Tài khoản demo
 
