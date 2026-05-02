@@ -10,6 +10,7 @@ import {
     PiggyBank,
     ReceiptText,
     ListTree,
+    LayoutDashboard,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
@@ -23,6 +24,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import admin from '@/routes/admin';
 import adminBudgets from '@/routes/admin/budgets';
 import adminCategories from '@/routes/admin/categories';
 import adminMenus from '@/routes/admin/menus';
@@ -35,6 +37,11 @@ import adminUsers from '@/routes/admin/users';
 import type { NavItem } from '@/types';
 
 const adminNavItems: NavItem[] = [
+    {
+        title: 'Dashboard',
+        href: admin.dashboard().url,
+        icon: LayoutDashboard,
+    },
     {
         title: 'Users',
         icon: Users,
@@ -111,7 +118,7 @@ export function AdminSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href={adminUsers.index().url} prefetch>
+                            <Link href={admin.dashboard().url} prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

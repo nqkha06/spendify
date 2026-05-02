@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\Appearance\OptionController;
 use App\Http\Controllers\Admin\BudgetController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PermissionController;
@@ -54,6 +55,7 @@ Route::middleware('auth')->prefix('user')->name('user.')->group(function () {
 });
 
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
     Route::resource('pages', PageController::class);
     Route::resource('users', UserController::class);
     Route::resource('categories', CategoryController::class);
