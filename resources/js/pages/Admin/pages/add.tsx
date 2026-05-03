@@ -194,7 +194,7 @@ export default function CreatePage() {
                                     Save & Exit
                                 </Button>
                             </CardContent>
-                        </Card>w
+                        </Card>
 
                         <Card>
                             <CardHeader>
