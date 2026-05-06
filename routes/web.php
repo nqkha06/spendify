@@ -34,7 +34,7 @@ Route::get('/p/{slug}', PublicPageShowController::class)
     ->where('slug', '.*')
     ->name('pages.show');
 
-Route::prefix('user')->name('expense.')->group(function () {
+Route::prefix('user')->middleware(['auth', 'role:user|admin'])->name('expense.')->group(function () {
     Route::get('/', HomeController::class)->name('home');
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::get('/transactions', TransactionsController::class)->name('transactions');
@@ -48,13 +48,13 @@ Route::prefix('user')->name('expense.')->group(function () {
     Route::get('/categories', CategoryListController::class)->name('categories.index');
 });
 
-Route::middleware('auth')->prefix('user')->name('user.')->group(function () {
+Route::middleware(['auth', 'role:user'])->prefix('user')->name('user.')->group(function () {
     Route::get('/settings', UserSettingsController::class)->name('settings');
     Route::patch('/settings/profile', UserProfileController::class)->name('settings.profile.update');
     Route::patch('/settings/preferences', UserPreferenceController::class)->name('settings.preferences.update');
 });
 
-Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
     Route::resource('pages', PageController::class);
     Route::resource('users', UserController::class);

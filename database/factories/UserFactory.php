@@ -23,8 +23,14 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $firstName = fake()->firstName();
+        $lastName = fake()->lastName();
+
         return [
-            'name' => fake()->name(),
+            'name' => "{$firstName} {$lastName}",
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'phone_number' => fake()->optional(70)->numerify('09########'),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
@@ -42,6 +48,14 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    public function demoCustomer(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'email_verified_at' => fake()->dateTimeBetween('-1 year', '-1 week'),
+            'phone_number' => fake()->numerify('09########'),
         ]);
     }
 

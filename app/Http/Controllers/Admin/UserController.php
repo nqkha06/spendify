@@ -33,6 +33,8 @@ class UserController extends Controller
             'sort_by' => $sortBy,
             'sort_direction' => $sortDirection,
             'per_page' => $perPage,
+            'email' => $request->get('email'),
+            'roles.name' => $request->get('role'),
         ]);
 
         return Inertia::render('Admin/users/list', [

@@ -11,10 +11,10 @@ use App\Repositories\Contracts\UserRepositoryInterface as UserRepository;
 #[ListQueryConfig(
     alias: 'users',
     searchable: ['name', 'email', 'id'],
-    filterable: ['status'],
+    filterable: ['status', 'email', 'roles.name'],
     sortable: ['id', 'name', 'email', 'created_at'],
     selectable: ['id', 'name', 'email', 'status', 'created_at'],
-    relations: [],
+    relations: ['roles'],
     defaultSort: [['field' => 'id', 'direction' => 'desc']],
     dateField: 'created_at',
     maxLimit: 100,

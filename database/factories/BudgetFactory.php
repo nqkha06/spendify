@@ -21,10 +21,28 @@ class BudgetFactory extends Factory
         return [
             'user_id' => User::factory(),
             'category_id' => Category::factory(),
-            'amount_limit' => fake()->randomFloat(2, 50, 10000),
+            'amount_limit' => fake()->randomFloat(2, 1_000_000, 20_000_000),
             'period' => fake()->randomElement(['monthly', 'yearly']),
-            'status' => fake()->randomElement(['active', 'inactive']),
-            'note' => fake()->optional()->sentence(),
+            'status' => fake()->randomElement(['active', 'active', 'inactive']),
+            'note' => fake()->optional()->randomElement([
+                'Theo dõi chi tiêu định kỳ.',
+                'Giới hạn để giữ dòng tiền ổn định.',
+                'Ngân sách thử nghiệm cho tháng này.',
+            ]),
         ];
+    }
+
+    public function monthly(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'period' => 'monthly',
+        ]);
+    }
+
+    public function active(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'status' => 'active',
+        ]);
     }
 }

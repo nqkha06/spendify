@@ -23,7 +23,6 @@ class AppRepositoryProvider extends ServiceProvider
         'App\Repositories\Contracts\ExpenseTransactionRepositoryInterface' => 'App\Repositories\ExpenseTransactionRepository',
 
         'App\Repositories\Contracts\MenuRepositoryInterface' => 'App\Repositories\MenuRepository',
-
     ];
 
     public function register(): void
