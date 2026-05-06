@@ -3,7 +3,6 @@ import { Plus, Target, AlertCircle, X } from 'lucide-react';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import TrackerLayout from '@/components/expense-tracker/layout';
-import { MOCK_CATEGORIES } from '@/lib/mock-data';
 import { formatCurrencyAmount, resolveCurrencyCode } from '@/lib/utils';
 import expense from '@/routes/expense';
 import type {
@@ -29,7 +28,7 @@ export default function Budgets({ navigation, profile, data }: BudgetsProps) {
     const categories =
         data?.categories && data.categories.length > 0
             ? data.categories
-            : MOCK_CATEGORIES;
+            : [];
     const budgets = data?.budgets ?? [];
 
     const {

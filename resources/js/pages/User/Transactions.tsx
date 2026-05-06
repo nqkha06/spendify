@@ -11,10 +11,7 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import TrackerLayout from '@/components/expense-tracker/layout';
-import {
-    MOCK_CATEGORIES,
-    MOCK_WALLETS,
-} from '@/lib/mock-data';
+
 import { formatCurrencyAmount, resolveCurrencyCode } from '@/lib/utils';
 import expense from '@/routes/expense';
 import type {
@@ -55,9 +52,9 @@ export default function Transactions({
     const categoryOptions =
         data?.categories && data.categories.length > 0
             ? data.categories
-            : MOCK_CATEGORIES;
+            : [];
     const walletOptions =
-        data?.wallets && data.wallets.length > 0 ? data.wallets : MOCK_WALLETS;
+        data?.wallets && data.wallets.length > 0 ? data.wallets : [];
 
     const {
         data: formData,
