@@ -7,6 +7,8 @@ use App\Traits\HasSpecificationBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Model;
+use App\Repositories\Contracts\BaseRepositoryInterface as BaseRepository;
 
 abstract class BaseService
 {
@@ -14,11 +16,11 @@ abstract class BaseService
 
     protected Request $request;
 
-    protected $result;
+    protected mixed $result;
 
-    protected $repository;
+    protected BaseRepository $repository;
 
-    protected $model;
+    protected Model $model;
 
     protected $modelData = [];
 
@@ -26,7 +28,7 @@ abstract class BaseService
 
     protected ?ListQueryConfig $querySetup = null;
 
-    public function __construct($repository)
+    public function __construct(BaseRepository $repository)
     {
         $this->repository = $repository;
         $this->bootstrapListQueryConfiguration();
@@ -65,7 +67,7 @@ abstract class BaseService
 
     public function find(int $id, array $with = [])
     {
-        $record = $this->repository->find($id, $with);
+        $record = $this->repository->with($with)->find($id);
         if (! $record) {
             abort(404);
         }

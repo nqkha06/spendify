@@ -18,13 +18,10 @@ use App\Repositories\Contracts\BudgetRepositoryInterface as BudgetRepository;
 )]
 class BudgetService extends BaseService
 {
-    protected $repository;
-
-    protected $with = ['user:id,name,email', 'category:id,name,color'];
+    // protected $with = ['user:id,name,email', 'category:id,name,color'];
 
     public function __construct(BudgetRepository $repository)
     {
-        $this->repository = $repository;
         parent::__construct($repository);
     }
 }

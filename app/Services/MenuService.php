@@ -18,11 +18,8 @@ use App\Repositories\Contracts\MenuRepositoryInterface as MenuRepository;
 )]
 class MenuService extends BaseService
 {
-    protected $repository;
-
     public function __construct(MenuRepository $repository)
     {
-        $this->repository = $repository;
         parent::__construct($repository);
     }
 }

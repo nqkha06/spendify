@@ -16,13 +16,11 @@ use App\Repositories\Contracts\PageRepositoryInterface as PageRepository;
     dateField: 'created_at',
     maxLimit: 100,
 )]
+
 class PageService extends BaseService
 {
-    protected $repository;
-
     public function __construct(PageRepository $repository)
     {
-        $this->repository = $repository;
         parent::__construct($repository);
     }
 }

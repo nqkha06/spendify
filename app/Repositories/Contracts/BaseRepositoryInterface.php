@@ -23,7 +23,7 @@ interface BaseRepositoryInterface
     public function delete(int $id = 0);
 
     public function getAllPaginated(array $search = [], int $pageSize = 10);
-
+    public function pagination(array $specification = []);
     public function find($id);
 
     public function findOrFail($value, ?string $column = null);

@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
-use App\Services\UserService;
 
 class UserController extends Controller
 {
@@ -28,6 +28,9 @@ class UserController extends Controller
         $sortDirection = $request->get('sort_direction', 'desc');
 
         $perPage = $request->get('per_page', 10);
+        $createdFrom = $request->get('created_date');
+        $createdTo = $request->get('created_date');
+
         $users = $this->service->paginate([
             'search' => $request->get('search'),
             'sort_by' => $sortBy,
@@ -35,6 +38,8 @@ class UserController extends Controller
             'per_page' => $perPage,
             'email' => $request->get('email'),
             'roles.name' => $request->get('role'),
+            'created_from' => $createdFrom,
+            'created_to' => $createdTo,
         ]);
 
         return Inertia::render('Admin/users/list', [
@@ -52,6 +57,12 @@ class UserController extends Controller
                 'sort_by' => $sortBy,
                 'sort_direction' => $sortDirection,
                 'per_page' => (int) $perPage,
+                'email' => $request->get('email'),
+                'role' => $request->get('role'),
+                'status' => $request->get('status'),
+                'created_date' => $request->get('created_date'),
+                'created_from' => $createdFrom,
+                'created_to' => $createdTo,
             ],
         ]);
     }
@@ -62,8 +73,9 @@ class UserController extends Controller
     public function create()
     {
         $roles = \Spatie\Permission\Models\Role::all();
+
         return Inertia::render('Admin/users/add', [
-            'roles' => $roles
+            'roles' => $roles,
         ]);
     }
 
@@ -76,7 +88,7 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Password::defaults()],
-            'roles' => ['array']
+            'roles' => ['array'],
         ]);
 
         $user = User::create([
@@ -102,7 +114,7 @@ class UserController extends Controller
 
         return Inertia::render('Admin/users/edit', [
             'user' => $user,
-            'roles' => $roles
+            'roles' => $roles,
         ]);
     }
 
@@ -113,15 +125,15 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$user->id],
             'password' => ['nullable', 'confirmed', Password::defaults()],
-            'roles' => ['array']
+            'roles' => ['array'],
         ]);
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
 
-        if (!empty($validated['password'])) {
+        if (! empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
         }
 

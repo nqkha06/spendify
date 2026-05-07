@@ -17,6 +17,7 @@ interface TrackerHeaderProps {
     navigation: TrackerNavigationItem[];
     activePath: string;
     profile?: TrackerProfile;
+
 }
 
 function normalizePath(pathOrUrl: string): string {

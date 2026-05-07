@@ -18,17 +18,14 @@ use App\Repositories\Contracts\ExpenseTransactionRepositoryInterface as ExpenseT
 )]
 class TransactionService extends BaseService
 {
-    protected $repository;
-
-    protected $with = [
-        'user:id,name,email',
-        'wallet:id,user_id,name,currency',
-        'category:id,name,color',
-    ];
+    // protected $with = [
+    //     'user:id,name,email',
+    //     'wallet:id,user_id,name,currency',
+    //     'category:id,name,color',
+    // ];
 
     public function __construct(ExpenseTransactionRepository $repository)
     {
-        $this->repository = $repository;
         parent::__construct($repository);
     }
 }

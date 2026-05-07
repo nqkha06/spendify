@@ -18,11 +18,8 @@ use App\Repositories\Contracts\CategoryRepositoryInterface as CategoryRepository
 )]
 class CategoryService extends BaseService
 {
-    protected $repository;
-
     public function __construct(CategoryRepository $repository)
     {
-        $this->repository = $repository;
         parent::__construct($repository);
     }
 }

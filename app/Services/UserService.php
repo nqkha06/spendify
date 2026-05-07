@@ -21,11 +21,8 @@ use App\Repositories\Contracts\UserRepositoryInterface as UserRepository;
 )]
 class UserService extends BaseService
 {
-    protected $repository;
-
     public function __construct(UserRepository $repository)
     {
-        $this->repository = $repository;
         parent::__construct($repository);
     }
 }
